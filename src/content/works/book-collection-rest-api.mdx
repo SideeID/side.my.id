@@ -1,0 +1,190 @@
+---
+id: 18
+author: SideID
+thumbnail: https://ik.imagekit.io/hrxp7yzjg/projects/BookCollectionRestAPI.jpg?updatedAt=1742448732768
+title: BookCollection REST API
+stack:
+  - Node.js
+  - Hapi.js
+repo: https://github.com/SideeID/API-Bookshelf
+description: A RESTful API for managing a collection of books, featuring CRUD operations.
+---
+
+<img
+  src="https://ik.imagekit.io/hrxp7yzjg/projects/BookCollectionRestAPI.jpg?updatedAt=1742448732768"
+  alt="BookCollection REST API"
+  fetchPriority="high"
+/>
+
+BookCollection REST API is a simple RESTful API built with Node.js and Hapi.js for managing a collection of books. It allows you to perform CRUD (Create, Read, Update, Delete) operations on book records.
+
+## Key Features
+
+* **Add a new book:** Create new book entries.
+* **Get all books:** Retrieve a list of all books.
+* **Get book details by ID:** Retrieve detailed information for a specific book.
+* **Update book details by ID:** Modify existing book information.
+* **Delete a book by ID:** Remove a book from the collection.
+* **Query Parameters:** Support for filtering book lists by name, reading status, and finished status.
+
+## Endpoints
+
+* **Add a new book (POST /books):**
+
+    ```json
+    {
+      "name": "Book Name",
+      "author": "Author Name",
+      "year": 2023,
+      "publisher": "Publisher Name",
+      "summary": "Summary of the book",
+      "readPage": 100,
+      "reading": true,
+      "pageCount": 200
+    }
+    ```
+
+    Response:
+
+    ```json
+    {
+      "status": "success",
+      "message": "Buku berhasil ditambahkan",
+      "data": {
+        "bookId": "nanoid"
+      }
+    }
+    ```
+
+* **Get all books (GET /books):**
+
+    Query Parameters (optional): `name`, `reading`, `finished`
+
+    Response:
+
+    ```json
+    {
+      "status": "success",
+      "data": {
+        "books": [
+          {
+            "id": "nanoid",
+            "name": "Book Name",
+            "publisher": "Publisher Name"
+          }
+        ]
+      }
+    }
+    ```
+
+* **Get book details by ID (GET /books/bookId):**
+
+    Response:
+
+    ```json
+    {
+      "status": "success",
+      "data": {
+        "book": {
+          "id": "nanoid",
+          "name": "Book Name",
+          "author": "Author Name",
+          "year": 2023,
+          "publisher": "Publisher Name",
+          "summary": "Summary of the book",
+          "readPage": 100,
+          "reading": true,
+          "pageCount": 200,
+          "finished": false,
+          "insertedAt": "2023-05-01T00:00:00.000Z",
+          "updatedAt": "2023-05-01T00:00:00.000Z"
+        }
+      }
+    }
+    ```
+
+* **Update book details by ID (PUT /books/bookId):**
+
+    Request Body:
+
+    ```json
+    {
+      "name": "Updated Book Name",
+      "author": "Updated Author Name",
+      "year": 2023,
+      "publisher": "Updated Publisher Name",
+      "summary": "Updated summary of the book",
+      "readPage": 150,
+      "reading": false,
+      "pageCount": 200
+    }
+    ```
+
+    Response:
+
+    ```json
+    {
+      "status": "success",
+      "message": "Buku berhasil diperbarui"
+    }
+    ```
+
+* **Delete a book by ID (DELETE /books/bookId):**
+
+    Response:
+
+    ```json
+    {
+      "status": "success",
+      "message": "Buku berhasil dihapus"
+    }
+    ```
+
+## Technologies Used
+
+* **Node.js:** For the server-side runtime environment.
+* **Hapi.js:** For building the RESTful API.
+* **nanoid:** For generating unique IDs.
+* **Newman:** For running Postman collection tests.
+
+## Getting Started
+
+1.  Clone the repository from GitHub:
+
+    ```bash
+    git clone https://github.com/SideeID/API-Bookshelf.git
+    ```
+
+2.  Navigate to the project directory:
+
+    ```bash
+    cd API-Bookshelf
+    ```
+
+3.  Install dependencies:
+
+    ```bash
+    npm install
+    ```
+
+4.  Start the development server:
+
+    ```bash
+    npm run start-dev
+    ```
+
+    Or start the server in production mode:
+
+    ```bash
+    npm start
+    ```
+
+5.  Run tests:
+
+    ```bash
+    npm test
+    ```
+
+## Contribution
+
+This is a personal learning project and does not accept external contributions.

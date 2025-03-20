@@ -1,0 +1,80 @@
+---
+import Card from "@/components/Card.astro";
+import ReadingIndicator from "@/components/svelte/ReadingIndicator.svelte";
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const notes = await getCollection("notes");
+
+export async function getStaticPaths() {
+  const notesEntries = await getCollection("notes");
+
+  const tags = [
+    ...new Set(
+      notesEntries
+        .map((item) => [...new Set(item.data.tags)].join(" "))
+        .join(" ")
+        .split(" ")
+    ),
+  ].sort((a, b) => {
+    if (a > b) return 1;
+    if (a < b) return -1;
+    return 0;
+  });
+
+  return tags.map((item) => ({
+    params: { slug: item },
+    props: { item },
+  }));
+}
+
+// get dynamic path
+const currentPath = Astro.url.pathname.split("/")[2];
+---
+
+<ReadingIndicator client:only="svelte" />
+<Layout
+  title={`Notes with tag ${currentPath}.`}
+  description="Notes with tag"
+  url={`https://side.my.id/tags/${currentPath}`}
+>
+  <div
+    class:list={[
+      "flex w-full flex-col items-start justify-start",
+      "md:text-start",
+    ]}
+  >
+    <section class="w-full">
+      <h1 class="mb-0">./tags/{currentPath}</h1>
+      <div class="slide-enter-content">
+        <p id="description" class="mb-0 text-justify">
+          Notes with tag {currentPath}.
+        </p>
+      </div>
+    </section>
+    <section class="mt-8 w-full">
+      <div
+        class="grid w-full grid-cols-1 grid-rows-1 gap-4 sm:grid-cols-2 slide-enter-content"
+      >
+        {
+          notes
+            .filter((item) => item.data.tags.includes(currentPath))
+            .sort(
+              (a, b) =>
+                new Date(b.data.created_at).getTime() -
+                new Date(a.data.created_at).getTime()
+            )
+            .map((item) => (
+              <Card
+                title={item.data.title}
+                description={item.data.description}
+                type="notes"
+                slug={item.slug}
+                createdAt={item.data.created_at}
+              />
+            ))
+        }
+      </div>
+    </section>
+  </div>
+</Layout>

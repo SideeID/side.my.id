@@ -1,0 +1,52 @@
+---
+import Card from "@/components/Card.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const notesList = await getCollection("notes");
+---
+
+<Layout
+  title="Notes"
+  description="Sometimes, I write something. Mostly about technical stuff. So yeah, I call this as Notes."
+  url="https://side.my.id/notes"
+>
+  <div
+    class:list={[
+      "flex w-full flex-col items-start justify-start",
+      "md:text-start",
+    ]}
+  >
+    <section class="w-full">
+      <h1 data-cy="heading" class="mb-0">./notes</h1>
+      <div class="slide-enter-content">
+        <p data-cy="description" class="mb-0 text-justify">
+          Sometimes, I write something. Mostly about technical stuff. So yeah, I
+          call this as <b>Notes.</b>
+        </p>
+      </div>
+    </section>
+    <section
+      data-cy="notes-list"
+      class="mt-8 grid w-full grid-cols-1 grid-rows-1 gap-4 sm:grid-cols-2 slide-enter-content"
+    >
+      {
+        notesList
+          .sort(
+            (a, b) =>
+              new Date(b.data.created_at).getTime() -
+              new Date(a.data.created_at).getTime()
+          )
+          .map((item) => (
+            <Card
+              type="notes"
+              title={item.data.title}
+              description={item.data.description}
+              slug={item.slug}
+              createdAt={item.data.created_at}
+            />
+          ))
+      }
+    </section>
+  </div>
+</Layout>

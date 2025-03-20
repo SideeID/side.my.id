@@ -1,0 +1,63 @@
+---
+import { Image } from "astro:assets";
+import { format } from "date-fns";
+
+type Props = {
+  thumbnail?: string;
+  title: string;
+  description: string;
+  slug: string;
+  createdAt?: Date;
+  type: "works" | "notes";
+};
+
+const { thumbnail, title, description, slug, createdAt, type } = Astro.props;
+---
+
+{
+  type === "notes" ? (
+    <div
+      class:list={[
+        "flex w-full flex-col bg-monochrome-1/70 hover:bg-monochrome-2/70 transition-all p-4 drop-shadow-xs card",
+        "flex-wrap border-[0.5px] rounded-md overflow-hidden border-monochrome-3",
+      ]}
+    >
+      {createdAt ? (
+        <span class="font-semibold">{format(createdAt, "LLLL d, yyyy")}</span>
+      ) : null}
+      <a
+        href={`/notes/${slug}`}
+        class:list={["mt-2 cursor-pointer text-lg font-bold", "no-underline!"]}
+      >
+        <h3 class="mb-0 mt-0 line-clamp-2 text-2xl font-bold">{title}</h3>
+      </a>
+      <p class="mb-0 mt-2 line-clamp-3">{description}</p>
+    </div>
+  ) : type === "works" ? (
+    <div
+      class:list={[
+        "flex w-full flex-col bg-monochrome-1/70 hover:bg-monochrome-2/70 drop-shadow-xs transition-all card",
+        "flex-wrap border-[0.5px] rounded-md overflow-hidden border-monochrome-3",
+      ]}
+    >
+      <Image
+        src={thumbnail as string}
+        alt={title}
+        width={500}
+        height={500}
+        quality={100}
+        format="avif"
+        class="my-0! object-cover h-48! w-full rounded-none! border-none!"
+      />
+      <div class="w-full p-4">
+        <a
+          href={`/works/${slug}`}
+          class:list={["cursor-pointer text-lg font-bold", "no-underline!"]}
+        >
+          <h3 class="mb-0 mt-0 line-clamp-2 text-2xl font-bold">{title}</h3>
+        </a>
+        <p class="mb-0 mt-2">{description}</p>
+      </div>
+    </div>
+  ) : null
+}

@@ -1,0 +1,54 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+
+const notes = await getCollection("notes");
+const tags = ([
+  ...new Set(
+    notes
+      .map((item: CollectionEntry<"notes">) => [...new Set(item.data.tags)].join(" "))
+      .join(" ")
+      .split(" ")
+  ),
+] as string[]).sort((a, b) => {
+  if (a > b) return 1;
+  if (a < b) return -1;
+  return 0;
+});
+---
+
+<Layout
+  title="Tags"
+  description="Select spesific notes based on the list of tags below."
+  url="https://side.my.id/tags"
+>
+  <div
+    class:list={[
+      "flex w-full flex-col items-start justify-start",
+      "md:text-start",
+    ]}
+  >
+    <section class="w-full">
+      <h1 data-cy="heading" class="mb-0">./tags</h1>
+      <div class="slide-enter-content">
+        <p data-cy="description" class="mb-0 text-justify">
+          Select spesific notes based on the list of tags below.
+        </p>
+      </div>
+    </section>
+    <section
+      data-cy="tags-list"
+      class="mt-8 flex w-full flex-wrap items-center justify-start gap-4 slide-enter-content"
+    >
+      {
+        tags.map((item) => (
+          <a href={`/tags/${item}`}>
+            <button class="bg-monochrome-2 px-4 py-1">
+              <p class="mb-0 mt-0 text-base-0">{item}</p>
+            </button>
+          </a>
+        ))
+      }
+    </section>
+  </div>
+</Layout>

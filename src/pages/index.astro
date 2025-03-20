@@ -1,0 +1,151 @@
+---
+import Card from "@/components/Card.astro";
+import Layout from "@/layouts/Layout.astro";
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+
+const [notesList, worksList] = await Promise.all([
+  await getCollection("notes"),
+  await getCollection("works"),
+]);
+---
+
+<Layout
+  title="Dimas Fajar Katon Prayogo"
+  description="Javascript / Typescript Developer"
+  url="https://side.my.id"
+>
+  <div
+    class:list={[
+      "flex w-full flex-col items-start justify-start",
+      "md:text-start",
+    ]}
+  >
+    <section class="w-full">
+      <div
+        class="slide-enter-content flex w-fit space-x-0 md:space-x-4 relative justify-start items-start"
+      >
+        <div
+          class="bg-monochrome-3 hidden md:block -rotate-3! p-1.5 rounded-md w-[500px] h-fit"
+        >
+          <Image
+            src="https://avatars.githubusercontent.com/u/132200554?v=4"
+            alt="Github Profile"
+            width={500}
+            height={500}
+            quality={100}
+            draggable={false}
+            format="avif"
+            class="photos w-36! my-0! border-none! object-cover"
+          />
+        </div>
+        <div>
+          <h2 data-cy="name" class="mb-0! mt-0!">Dimas Fajar Katon Prayogo</h2>
+            <p data-cy="description" class="mb-0! mt-2 text-justify text-base-0">
+            Konnichiwa! I'm Dimas. You can call me <b>Dimas/Dim/Mas</b>. I'm a Developer based in
+            Indonesia, also amateur badminton player in my free time. Day-to-day,
+            I mostly working on Backend stuff and currently learning Next, Svelte, Go, also DevOps.
+            </p>
+        </div>
+      </div>
+    </section>
+    <section data-cy="experience" class="mt-8 w-full slide-enter-content">
+      <h2 class="mb-6 mt-0 font-extrabold">Experience</h2>
+      <div class="space-y-5 slide-enter-content">
+        <div>
+          <div
+            class="flex w-full flex-col items-start justify-start sm:flex-row sm:items-center sm:justify-between"
+          >
+            <h3 class="mb-0 mt-0">Entercode - Team</h3>
+            <span class="mt-1.5 rounded-xs text-sm font-semibold sm:mt-0"
+              >Jan 2025 - Mar 2025</span
+            >
+          </div>
+          <p class="mb-0 mt-3 sm:mt-1 font-semibold">Fullstack Web Developer</p>
+          <ul class="list-disc pl-5 mt-2 text-sm space-y-1">
+            <li>Developed and maintained web applications using modern web technologies</li>
+            <li>Collaborated with cross-functional teams to deliver high-quality software solutions</li>
+            <li>Implemented responsive and user-friendly interfaces with optimal performance</li>
+          </ul>
+        </div>
+        <div>
+          <div
+            class="flex w-full flex-col items-start justify-start sm:flex-row sm:items-center sm:justify-between"
+            >
+            <h3 class="mb-0 mt-0">Inagata Technosmith - Team</h3>
+            <span class="mt-1.5 rounded-xs text-sm font-semibold sm:mt-0"
+              >Aug 2024 - Dec 2024</span
+            >
+            </div>
+            <p class="mb-0 mt-3 sm:mt-1 font-semibold">Backend Developer</p>
+            <ul class="list-disc pl-5 mt-2 text-sm space-y-1">
+            <li>Developed and maintained large-scale web applications using Laravel framework</li>
+            <li>Built annual performance evaluation system for Ministry of Religious Affairs</li>
+            <li>Implemented secure authentication, authorization and API endpoints</li>
+            <li>Optimized database queries and application performance for high traffic websites</li>
+            </ul>
+        </div>
+        <div>
+          <div
+            class="flex w-full flex-col items-start justify-start sm:flex-row sm:items-center sm:justify-between"
+          >
+            <h3 class="mb-0 mt-0">Independent Freelance</h3>
+            <span class="mt-1.5 rounded-xs text-sm font-semibold sm:mt-0"
+              >2023 - Present</span
+            >
+          </div>
+          <p class="mb-0 mt-3 sm:mt-1 font-semibold">Fullstack Web Developer</p>
+          <ul class="list-disc pl-5 mt-2 text-sm space-y-1">
+            <li>Consulted and developed custom web solutions for diverse client needs</li>
+            <li>Managed end-to-end project lifecycle from requirement gathering to deployment</li>
+            <li>Utilized modern frameworks and technologies to deliver innovative web applications</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section data-cy="featured-works" class="mt-8 w-full slide-enter-content">
+      <h2 class="mt-0 mb-6 font-extrabold">Featured Works</h2>
+      <div
+        class="grid w-full grid-cols-1 grid-rows-1 gap-4 sm:grid-cols-2 slide-enter-content"
+      >
+        {
+          worksList
+            .sort((a, b) => a.data.id - b.data.id)
+            .slice(0, 4)
+            .map((item) => (
+              <Card
+                title={item.data.title}
+                description={item.data.description}
+                thumbnail={item.data.thumbnail}
+                type="works"
+                slug={item.slug}
+              />
+            ))
+        }
+      </div>
+    </section>
+    <section data-cy="featured-notes" class="mt-8 w-full">
+      <h2 class="mt-0 mb-6 font-extrabold">Latest Notes</h2>
+      <div class="grid w-full grid-cols-1 grid-rows-1 gap-4 sm:grid-cols-2">
+        {
+          notesList
+            .sort(
+              (a, b) =>
+                new Date(b.data.created_at).getTime() -
+                new Date(a.data.created_at).getTime()
+            )
+            .slice(0, 4)
+            .map((item) => (
+              <Card
+                title={item.data.title}
+                description={item.data.description}
+                slug={item.slug}
+                createdAt={item.data.created_at}
+                type="notes"
+              />
+            ))
+        }
+      </div>
+    </section>
+  </div>
+</Layout>

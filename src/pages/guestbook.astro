@@ -1,0 +1,75 @@
+<!-- ---
+import Layout from "@/layouts/Layout.astro";
+import type { GuestbookProps } from "@/types";
+import {
+  PUBLIC_DEVELOPMENT_URL,
+  PUBLIC_PRODUCTION_URL,
+} from "@/utils/constants";
+import { format } from "date-fns";
+
+const response = await fetch(
+  `${import.meta.env.MODE === "development" ? PUBLIC_DEVELOPMENT_URL : PUBLIC_PRODUCTION_URL}/api/guestbook`,
+  {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  }
+);
+
+const data = await response.json();
+const guestbook: GuestbookProps[] = data.data;
+---
+
+<Layout
+  title="Guestbook"
+  description="Write a message for me and others."
+  url="https://side.my.id/guestbook"
+>
+  <div
+    class:list={[
+      "flex w-full flex-col items-start justify-start",
+      "md:text-start",
+    ]}
+  >
+    <section class="w-full">
+      <h1 data-cy="heading" class="mb-0">Guestbook</h1>
+      <div class="slide-enter-content">
+        <p data-cy="description" class="mb-0 text-justify">
+          Write a message for me and others. Go to
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://guestbook.side.my.id">guestbook.side.my.id</a
+          > to add your message.
+        </p>
+      </div>
+    </section>
+    <section
+      data-cy="guestbook"
+      class="flex w-full flex-col space-y-6 mt-8 items-start justify-start slide-enter-content"
+    >
+      {
+        guestbook ? (
+          guestbook
+            .sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+            )
+            .map((item) => (
+              <div>
+                <h3 class="!my-0">{item.message}</h3>
+                <p class="!mb-0 mt-2">
+                  {item.username}. {format(item.created_at, "MMMM d, y")}
+                </p>
+              </div>
+            ))
+        ) : (
+          <p class="font-bold">There is no message right now!</p>
+        )
+      }
+    </section>
+  </div>
+</Layout> -->
