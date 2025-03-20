@@ -1,0 +1,78 @@
+---
+import TOC from "@/components/TOC.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { ArrowLeftIcon } from "lucide-svelte";
+
+export async function getStaticPaths() {
+  const worksEntries = await getCollection("works");
+
+  return worksEntries.map((item) => ({
+    params: { slug: item.slug },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content, headings, remarkPluginFrontmatter } = await item.render();
+---
+
+{/* <ReadingIndicator client:only="svelte" /> */}
+<Layout
+  title={item.data.title}
+  description={item.data.description}
+  url={`https://side.my.id/works/${item.slug}`}
+>
+  <div class="w-full text-justify slide-enter-content">
+    <a href="/works" class="flex w-fit items-center justify-center">
+      <button
+        type="button"
+        aria-label="back to works"
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-monochrome-2"
+      >
+        <ArrowLeftIcon className="text-center" />
+      </button>
+    </a>
+    <h1 class="mt-4">{item.data.title}</h1>
+    <div class="flex w-full items-center space-x-2">
+      <div class="rounded-full!">
+        <img
+          src="https://avatars.githubusercontent.com/u/132200554?v=4"
+          alt="SideID"
+          class="my-0! h-7 w-7 rounded-full! py-0!"
+        />
+      </div>
+      <span class="font-bold"
+        >{item.data.author}, {remarkPluginFrontmatter.minutesRead}.
+      </span>{" "}
+      <div class="flex items-center justify-center space-x-1.5 font-bold">
+        {
+          item.data.preview ? (
+            <>
+              <a
+                href={item.data.preview}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Preview
+              </a>
+              <span> / </span>
+            </>
+          ) : null
+        }
+        {
+          item.data.repo ? (
+            <a href={item.data.repo} target="_blank" rel="noopener noreferrer">
+              Source
+            </a>
+          ) : null
+        }
+      </div>
+    </div>
+    <!-- <p class="arabic-font text-right text-xl font-bold">
+      بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+    </p> -->
+    <Content />
+  </div>
+  {headings && headings.length > 0 ? <TOC headings={headings} /> : null}
+</Layout>
