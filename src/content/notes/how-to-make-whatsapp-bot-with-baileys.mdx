@@ -1,0 +1,396 @@
+---
+author: SideID
+title: How to Make WhatsApp bot with Baileys
+tags:
+  - bot
+created_at: 2025-03-21
+description: How to make a WhatsApp bot with Baileys, a library fot whatsapp webhook.
+---
+
+## Introduction
+
+Hey folks! 👋 Today I'm gonna show you how to whip up a super cool WhatsApp bot using Baileys and Gemini AI. Trust me, it's gonna be a blast! This is your step-by-step guide to creating a bot that'll make your friends go "Whoa, how'd you do that?!" Just keep in mind that tech moves fast, so you might need to tweak stuff as libraries evolve.
+
+## Prerequisites
+
+Before we dive in, here's what you'll need:
+
+- Node.js installed on your machine (version 16 or higher is the way to go)
+- Some basic JavaScript/TypeScript know-how (nothing too fancy!)
+- A Google Cloud project with Gemini API enabled (for that AI magic ✨)
+
+## Step 1: Initialize a New Project
+
+First things first, let's create a cozy little home for our project:
+
+```bash
+mkdir whatsapp-gemini-bot
+
+cd whatsapp-gemini-bot
+```
+
+Now let's get our Node.js project rolling with this quick command:
+
+```bash
+npm init -y
+```
+
+## Step 2: Install Dependencies
+
+Time to grab all the goodies we need! Run this in your terminal:
+
+```bash
+npm install @whiskeysockets/baileys pino qrcode-terminal @google/generative-ai dotenv
+
+npm install --save-dev nodemon
+```
+
+Here's what all this techy stuff does:
+
+- `@whiskeysockets/baileys`: Your ticket to WhatsApp Web API in Node.js land
+- `pino`: A super zippy logger that'll keep track of what's happening
+- `qrcode-terminal`: Shows those funky QR codes right in your terminal
+- `@google/generative-ai`: The brain behind our bot - Google's Gemini AI
+- `dotenv`: Keeps our secret stuff secret (like API keys)
+- `nodemon`: This bad boy auto-restarts our app when we make changes (huge time-saver!)
+
+## Step 3: Project Structure
+
+Let's get organized! Set up your project folders like this:
+
+```bash
+whatsapp-gemini-bot/
+├── sessions/
+├── src/
+│   ├── controllers/
+│   │   ├── gemini.js
+│   ├── database/
+│   │   ├── migrations/
+│   │   ├── models/
+│   ├── utils/
+│   ├── index.js
+├── .env
+├── .gitignore
+├── package.json
+├── package-lock.json
+```
+
+## Step 4: Set Up Environment Variables
+
+Create a `.env` file in your project root to stash your Gemini API key:
+
+```bash
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+## Step 5: Create the Gemini Controller
+
+Now let's build the brains of our operation - the Gemini controller:
+
+```javascript
+// src/controllers/gemini.js
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+require('dotenv').config();
+
+// Grab that API key from our secret stash
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Fire up that Gemini Pro model
+const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+
+/**
+ * Get those sweet AI responses
+ * @param {string} prompt - What the human asked
+ * @returns {Promise<string>} - What the AI thinks
+ */
+async function generateResponse(prompt) {
+  try {
+    // Let the AI cook up something good
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error('Oops! Gemini had a brain freeze:', error);
+    return 'Sorry, my brain just glitched out! Try asking something else?';
+  }
+}
+
+module.exports = {
+  generateResponse,
+};
+```
+
+## Step 6: Create the Main Application
+
+Alright, let's build the heart of our WhatsApp bot:
+
+```javascript
+// src/index.js
+const {
+  default: makeWASocket,
+  DisconnectReason,
+  useMultiFileAuthState,
+} = require('@whiskeysockets/baileys');
+const pino = require('pino');
+const { Boom } = require('@hapi/boom');
+const qrcode = require('qrcode-terminal');
+const path = require('path');
+const fs = require('fs');
+const { generateResponse } = require('./controllers/gemini');
+
+// Set up a spot to save our session data
+const sessionsDir = path.join(__dirname, '../sessions');
+if (!fs.existsSync(sessionsDir)) {
+  fs.mkdirSync(sessionsDir, { recursive: true });
+}
+
+// Logger setup (keeping it chill with minimal logs)
+const logger = pino({ level: 'warn' });
+
+// The magic function that fires up our WhatsApp connection
+async function startWhatsApp() {
+  // Load up our saved session (if we have one)
+  const { state, saveCreds } = await useMultiFileAuthState('sessions');
+
+  const sock = makeWASocket({
+    printQRInTerminal: true, // Show that QR code in terminal
+    auth: state, // Use our saved login (if available)
+    logger, // Keep track of what's happening
+  });
+
+  // Handle connection stuff
+  sock.ev.on('connection.update', async (update) => {
+    const { connection, lastDisconnect, qr } = update;
+
+    if (connection === 'close') {
+      const shouldReconnect =
+        lastDisconnect?.error instanceof Boom
+          ? lastDisconnect.error.output.statusCode !==
+            DisconnectReason.loggedOut
+          : true;
+
+      console.log(
+        'Dang, connection dropped because:',
+        lastDisconnect?.error,
+        'Trying again?',
+        shouldReconnect ? 'Yup!' : 'Nope!',
+      );
+
+      if (shouldReconnect) {
+        startWhatsApp();
+      }
+    } else if (connection === 'open') {
+      console.log("Woot! We're connected! 🎉");
+    }
+
+    // If we got a QR code, show it so you can scan it
+    if (qr) {
+      qrcode.generate(qr, { small: true });
+      console.log('👆 Scan this QR code with your WhatsApp app!');
+    }
+  });
+
+  // Save our login creds
+  sock.ev.on('creds.update', saveCreds);
+
+  // This is where the magic happens - handling messages!
+  sock.ev.on('messages.upsert', async ({ messages }) => {
+    const message = messages[0];
+
+    // Ignore stuff we don't care about
+    if (
+      (!message.message?.conversation &&
+        !message.message?.extendedTextMessage?.text) ||
+      message.key.fromMe ||
+      message.key.remoteJid === 'status@broadcast'
+    ) {
+      return;
+    }
+
+    // Grab the message text
+    const messageText =
+      message.message.conversation ||
+      message.message.extendedTextMessage?.text ||
+      '';
+
+    // Who sent it?
+    const sender = message.key.remoteJid;
+
+    console.log(`Got a message from ${sender}: ${messageText}`);
+
+    // Only respond to messages starting with !gemini
+    if (!messageText.toLowerCase().startsWith('!gemini')) {
+      return;
+    }
+
+    // Strip off the command part
+    const query = messageText.slice('!gemini'.length).trim();
+
+    // Let 'em know we're on it
+    await sock.sendMessage(sender, {
+      text: '🧠 Hmm, let me think about that...',
+    });
+
+    try {
+      // Ask our AI buddy for an answer
+      const aiResponse = await generateResponse(query);
+
+      // Send that smart response back
+      await sock.sendMessage(sender, { text: aiResponse });
+    } catch (error) {
+      console.error('Oof, something went wrong:', error);
+      await sock.sendMessage(sender, {
+        text: 'My brain just short-circuited! Can you try again?',
+      });
+    }
+  });
+}
+
+// Fire this baby up!
+startWhatsApp();
+```
+
+## Step 7: Update package.json Scripts
+
+Let's make our lives easier with some handy npm commands:
+
+```json
+{
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  }
+}
+```
+
+## Step 8: Create gitignore
+
+Gotta keep those sensitive files outta git with a `.gitignore`:
+
+```
+# Node modules
+node_modules/
+
+# Secret stuff
+.env
+
+# WhatsApp sessions
+sessions/
+
+# Boring log files
+*.log
+
+# IDE junk
+.vscode/
+.idea/
+```
+
+## Step 9: Running the Bot
+
+Time for the grand finale! Fire it up with:
+
+```bash
+npm run start
+```
+
+A QR code will pop up in your terminal - scan that bad boy with your WhatsApp app. Once you're connected, anyone can chat with your bot by sending a message starting with `!gemini` followed by whatever they want to ask.
+
+## How It Works
+
+Here's the lowdown on what's happening behind the scenes:
+
+1. **Connection**: Our bot hooks up to WhatsApp Web using Baileys
+2. **Authentication**: Your phone proves you're legit when you scan the QR code
+3. **Message Handling**: The bot keeps an eye out for messages starting with `!gemini`
+4. **AI Magic**: We shoot those messages over to Gemini AI for some brainy answers
+5. **Response**: Your bot sends those smart replies back to the WhatsApp user
+
+## Spice Up Your Bot
+
+Want your bot to do even more cool stuff? Here are some rad ideas:
+
+### Add More Commands
+
+Make your bot a multi-talented superstar:
+
+```javascript
+// Handle all kinds of different commands
+if (messageText.toLowerCase().startsWith('!gemini')) {
+  // AI stuff we already set up
+  // ...existing code...
+} else if (messageText.toLowerCase().startsWith('!weather')) {
+  // Weather forecast? No problem!
+  // Hook up to a weather API
+} else if (messageText.toLowerCase().startsWith('!meme')) {
+  // Everyone loves memes, right?
+  // Pull from a meme API
+}
+```
+
+### Add Database Integration
+
+Make your bot remember stuff with a database (MongoDB is pretty sweet):
+
+```javascript
+// Example with MongoDB
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const User = require('./models/User');
+
+// Save convos for later
+async function saveUserInteraction(userId, query, response) {
+  try {
+    await User.findOneAndUpdate(
+      { whatsappId: userId },
+      {
+        $push: { interactions: { query, response, timestamp: new Date() } },
+        $setOnInsert: { whatsappId: userId, createdAt: new Date() },
+      },
+      { upsert: true, new: true },
+    );
+  } catch (error) {
+    console.error('Database threw a tantrum:', error);
+  }
+}
+```
+
+### Handle Pictures Too
+
+Take it to the next level by handling images:
+
+```javascript
+// Check if someone sent a pic
+if (message.message?.imageMessage) {
+  const imageMessage = message.message.imageMessage;
+  const caption = imageMessage.caption || '';
+
+  // Grab that image
+  const buffer = await downloadMediaMessage(
+    message,
+    'buffer',
+    {},
+    {
+      logger,
+      reuploadRequest: sock.updateMediaMessage,
+    },
+  );
+
+  // Do something cool with it - maybe analyze it?
+  // Hook up to an image recognition API
+  // await sock.sendMessage(sender, { text: "That looks like a cat! 🐱" });
+}
+```
+
+## Wrapping Up
+
+Boom! You just built yourself a legit WhatsApp bot that's packing some serious AI power! Your friends are gonna be seriously impressed when they can chat with your bot and get those smart Gemini AI responses.
+
+The way we've set it up makes it super easy to add more cool features down the road. Sky's the limit!
+
+Just remember to play nice with WhatsApp's rules about bots and automated messaging. Nobody wants to get their number blocked for spamming folks!
+
+Happy coding, and go wild with your awesome new bot! 🚀
