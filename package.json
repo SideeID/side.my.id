@@ -38,6 +38,7 @@
     "astro": "^5.1.9",
     "astro-compressor": "^1.0.0",
     "date-fns": "4.1.0",
+    "gsap": "^3.12.7",
     "lucide-svelte": "^0.474.0",
     "mdast-util-to-string": "^4.0.0",
     "purgecss": "^7.0.2",
