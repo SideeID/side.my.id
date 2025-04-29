@@ -1,0 +1,341 @@
+---
+author: SideID
+title: Setup CI/CD Pipeline dengan GitHub Actions untuk Aplikasi Laravel & cPanel
+tags:
+  - devops
+  - laravel
+  - github-actions
+  - ci-cd
+created_at: 2025-04-29
+description: Panduan langkah demi langkah untuk mengatur CI/CD pipeline menggunakan GitHub Actions untuk aplikasi Laravel yang dihosting di cPanel.
+---
+
+# Setup CI/CD Pipeline dengan GitHub Actions untuk Aplikasi Laravel & cPanel
+
+## Pendahuluan
+
+Yo.. halo para developer! 👋 pernah ga si klean merasa capek letih malas dan mager buat deploy aplikasi laravel ke server shared hosting? upload file satu-satu, jalanin migrasi database terus terusan tiap ada update, clear cache, dan sebagainya... Mager banget njir 😓
+
+Apa??? klean pada kalo deploy projek laravel masih di zip? yang bener aja. Nah, di tutorial ini, gua mau sharing nih cara setup CI/CD pipeline pake `Github Actions` yang bakal otomatis ngelakuin testing dan deploy aplikasi Laravel koe pada ke cPanel/shared hosting tiap kali klean push code ke branch repository github. Anjay kan?? Dijamin workflow development koe bakal lebih efisien cuy!
+
+## Apa sih CI/CD itu?
+
+Sebelum gas ke tutorialnya, biasakan belajar fundamentalnya dulu ye, jangan langsung lompat sana sini, minimal tau dulu apa itu CI/CD:
+
+**CI (Continuous Integration)** itu praktik dimana kita sering-sering push code ke repo utama, terus dijalanin testing otomatis gitu. Biar ga ada konflik mulu pas merge.
+
+**CD (Continuous Deployment/Delivery)** itu lanjutannya CI. Kalo code udah lolos testing, langsung deh di-deploy ke server production. Auto Gacorrr!
+
+GitHub Actions tuh tool bawaan GitHub yang bikin kita bisa otomatisasi hal-hal kayak gini, termasuk CI/CD, tanpa perlu sewa server lain. Keren parah kan? ya jelas 🔥🚀
+
+## Yang Harus Koe Siapin Dulu
+
+Sebelum mulai, pastiin koe udah punya:
+
+- Project Laravel yang udah nongkrong di repo GitHub
+- Akses ke shared hosting/cPanel (ya iyalah masa deploy ga punya akses 🤣)
+- Akses SSH ke server cPanel (kalo ga ada bisa pake FTP juga sih, tapi jangan deh, ribet)
+- Domain/subdomain yang udah disetting di cPanel
+- MySQL database yang udah jadi di cPanel (sebenarnya malas banget njir pakek MySQL :v)
+
+## Step 1: Siapin Repository GitHub
+
+Pertama, kita perlu nyiapin repo GitHub kita dulu:
+
+1. Login ke akun GitHub koe pada
+2. Bikin repo baru atau pake repo Laravel yang udah ada juga bisa
+3. Clone repo ke laptop koe (kalo belom)
+
+```bash
+git clone https://github.com/username/laravel-project.git
+cd laravel-project
+```
+
+4. Pastiin struktur project Laravel koe udah standard ya dan `.gitignore` udah bener settingnya (jangan sampe `.env` production kebawa push ya gengs! 🙈)
+
+## Step 2: Setting Laravel buat Production
+
+Sebelum kita setup CI/CD pipeline, pastiin aplikasi Laravel koe siap buat environment production dulu:
+
+1. Pastiin file `.env.example` udah ada semua variable yang diperluin (jangan ada password asli ya, awas kalo bocor! 🤫)
+2. Update `config/app.php` dengan setting production yang bener (debug = false, dll)
+3. Bikin file `public/.htaccess` dengan konfigurasi yang cocok buat shared hosting, biasanya udah ada si
+
+Nih contoh `.htaccess` yang biasanya ngaruh di cPanel:
+
+```apache
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+```
+
+Pake ini aja, percaya deh ini udah gua test berkali-kali dan works like charm! ✨
+
+## Step 3: Persiapan di Server cPanel
+
+Sekarang kita perlu menyiapkan server cPanel:
+
+1. Login ke cPanel
+2. Buat database MySQL baru (atau gunakan yang sudah ada)
+3. Buat user database dan berikan akses penuh ke database
+4. Catat credentials database ini untuk digunakan nanti
+5. (Optional) Setup subdomain jika diperlukan
+6. Catat path ke public_html atau direktori website koe
+
+## Step 4: Setup GitHub Secrets
+
+Sekarang saatnya setup rahasia-rahasia yang dibutuhkan GitHub Actions:
+
+1. Di repository GitHub koe, klik tab "Settings"
+2. Pilih "Secrets and variables" -> "Actions" di sidebar
+3. Klik "New repository secret"
+
+Add secrets berikut ini:
+
+- `CPANEL_HOST` - hostname cPanel koe (e.g., `cpanel.domain.com`)
+- `CPANEL_USERNAME` - username cPanel
+- `CPANEL_PASSWORD` - password cPanel
+- `CPANEL_REPOSITORY_ROOT` - path lengkap ke direktori website (e.g., `/home/username/public_html`)
+- `LARAVEL_ENV` - isi file `.env` untuk production
+
+Untuk `LARAVEL_ENV`, copy seluruh isi file `.env` production koe (dengan credentials database production) dan paste sebagai value dari secret. Pastikan semua setting sudah benar untuk environment production.
+
+## Step 5: Buat GitHub Actions Workflow
+
+Saatnya bikin magic happen! (ini bukan ilmu hitam ya) ✨ Buat file `.github/workflows/deploy.yml` di repository koe. Sesuain lagi ni kode workflow sesuai kebutuhan projek klean, kalo bingung cara ngubahnya, tanya AI aja.
+
+```yaml
+name: Deploy Laravel to cPanel
+on:
+  push:
+    branches: [ main ]  # Sesuaikan dengan branch yang koe gunakan
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'  # Sesuaikan dengan versi PHP di server
+        extensions: mbstring, dom, fileinfo, mysql
+        coverage: xdebug
+    
+    - name: Copy .env file
+      run: cp .env.example .env
+    
+    - name: Install Composer dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+    
+    - name: Generate application key
+      run: php artisan key:generate
+    
+    - name: Directory Permissions
+      run: chmod -R 777 storage bootstrap/cache
+    
+    - name: Create Database
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+    
+    - name: Run Laravel Tests
+      run: php artisan test
+    
+  deploy:
+    needs: laravel-tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'  # Sesuaikan dengan versi PHP di server
+    
+    - name: Install Composer dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+    
+    - name: Generate .env file
+      run: echo "${{ secrets.LARAVEL_ENV }}" > .env
+    
+    - name: Generate application key
+      run: php artisan key:generate
+    
+    - name: Clear config
+      run: php artisan config:clear
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+    
+    - name: Install NPM dependencies
+      run: npm ci
+    
+    - name: Build assets
+      run: npm run build  # Sesuaikan dengan command build di package.json
+    
+    - name: Deploy to cPanel
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.CPANEL_HOST }}
+        username: ${{ secrets.CPANEL_USERNAME }}
+        password: ${{ secrets.CPANEL_PASSWORD }}
+        server-dir: ${{ secrets.CPANEL_REPOSITORY_ROOT }}/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/vendor/**
+          .env.example
+          .gitattributes
+          .gitignore
+    
+    - name: Execute post-deployment commands
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.CPANEL_HOST }}
+        username: ${{ secrets.CPANEL_USERNAME }}
+        password: ${{ secrets.CPANEL_PASSWORD }}
+        script: |
+          cd ${{ secrets.CPANEL_REPOSITORY_ROOT }}
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          php artisan optimize
+```
+
+## Step 6: Push dan Jalankan Workflow
+
+Sekarang tinggal commit dan push file workflow tadi ke repository:
+
+```bash
+git add .github/workflows/deploy.yml
+git commit -m "Add GitHub Actions workflow for CI/CD"
+git push origin main  # Sesuaikan dengan branch yang klean gunakan
+```
+
+Begitu klean push, GitHub Actions akan otomatis menjalankan workflow yang sudah kita buat. klean bisa memantau progressnya dengan klik tab "Actions" di repository GitHub klean.
+
+## Step 7: Cek Hasil Deployment
+
+Setelah GitHub Actions selesai running, cek website klean buat mastiin deployment sukses. FYI aja nih, deployment pertama biasanya lemot banget soalnya harus upload banyak file. Sabar ya brader! ⏳
+
+## Sebenernya Apa Sih yang Terjadi di Workflow?
+
+Mari kita breakdown workflow yang kita bikin (biar koe paham dan ga cuma copy-paste doang 😜):
+
+### Job 1: Laravel Tests
+1. Setup environment dengan PHP yang cocok di server GitHub
+2. Install semua dependencies pake composer
+3. Bikin database buat testing (pake SQLite biar gampang)
+4. Jalanin automated tests Laravel (biar ga deploy bug ke production! tapi kalo malas ya ga usah bikin testing lah, ribet njir)
+
+<img
+  src='https://ik.imagekit.io/hrxp7yzjg/projects/WhatsApp%20Image%202025-04-19%20at%2022.40.08_ad3082d4.jpg?updatedAt=1745914723093'
+  alt='testing'
+  fetchPriority='high'
+/>
+
+### Job 2: Deploy
+1. Install dependencies buat production (tanpa dev packages biar ga berat)
+2. Bikin file `.env` dari GitHub Secrets (yang udah kita simpen)
+3. Compile assets buat frontend (kalo pake Laravel Mix/Vite)
+4. Upload semua file ke cPanel pake FTP (otomatis broo!)
+5. Jalanin perintah post-deployment via SSH:
+   - Migrasi database (tanpa perlu SSH manual ke server!)
+   - Cache config, route, sama view (biar aplikasi ngebut 🚀)
+   - Optimisasi aplikasi (biar makin kenceng lagi)
+
+## Optimasi dan Tips Tambahan (Tapi ga perlu juga si kalo projek klean kecil)
+
+### 1. Caching untuk Mempercepat Build
+
+Tambahkan langkah caching untuk mempercepat proses CI/CD:
+
+```yaml
+- name: Cache Composer dependencies
+  uses: actions/cache@v3
+  with:
+    path: vendor
+    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+    restore-keys: ${{ runner.os }}-composer-
+
+- name: Cache NPM dependencies
+  uses: actions/cache@v3
+  with:
+    path: node_modules
+    key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+    restore-keys: ${{ runner.os }}-npm-
+```
+
+### 2. Setup Branch Protection Rules
+
+Untuk memastikan code yang di-deploy sudah melalui testing:
+
+1. Di repository GitHub, klik "Settings" > "Branches"
+2. Add rule untuk branch main (atau branch yang digunakan untuk deployment)
+3. Check "Require status checks to pass before merging"
+4. Select "laravel-tests" sebagai required check
+
+### 3. Notifikasi Deployment (sumpah ini ga penting deh, mending ga usah, ribet lagi)
+
+Tambahkan notifikasi Slack/Discord di akhir workflow:
+
+```yaml
+- name: Send notification
+  uses: rtCamp/action-slack-notify@v2
+  env:
+    SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    SLACK_TITLE: "Deployment Completed"
+    SLACK_MESSAGE: "Laravel app has been deployed to production"
+```
+
+## Troubleshooting
+
+### Error: "Could not connect to server"
+
+- Periksa kembali credentials cPanel di GitHub Secrets
+- Pastikan server mengizinkan koneksi FTP dari IP GitHub Actions
+
+### Error: "Permission denied"
+
+- Periksa permission direktori di cPanel
+- Pastikan user cPanel memiliki akses write ke direktori yang ditentukan
+
+### Error: "Artisan command failed"
+
+- Periksa apakah PHP CLI tersedia di server
+- Pastikan versi PHP di workflow sama dengan di server
+- Coba jalankan command secara manual via SSH untuk debug
+
+## Kesimpulan
+
+Selamat gess! 🎉🥳 koe udah berhasil setup CI/CD pipeline buat aplikasi Laravel pake GitHub Actions dan cPanel. Sekarang, tiap kali koe push code ke branch main, GitHub Actions bakal otomatis jalanin test dan deploy aplikasi ke server production. Ga perlu lagi deh upload file manual dan kena marah klien gara-gara typo wkwkwk.
+
+Setup ini bakal ngirit waktu banget dan ngurangin kemungkinan human error pas deploy (tau sendiri kan kalo deploy malem-malem suka ngantuk dan salah 😴). Plus, dengan automated testing, koe juga lebih yakin kalo code yang di-deploy udah teruji dan works properly.
+
+Jangan lupa buat terus sesuaiin workflow sama kebutuhan project klean ya. CI/CD emang bukan satu ukuran cocok buat semua, tapi basic setup ini udah cukup banget buat kebanyakan project Laravel di shared hosting.
+
+Oke deh, sekian tutorial dari gua. Semoga bermanfaat dan bikin hidup klean sebagai developer jadi lebih enak! Adioss~ 👋💻✨
