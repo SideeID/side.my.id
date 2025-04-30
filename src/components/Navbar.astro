@@ -6,6 +6,7 @@ import {
   ImagesIcon,
   ListIcon,
   NotepadTextIcon,
+  FileBadge
 } from "lucide-svelte";
 import { twMerge } from "tailwind-merge";
 
@@ -28,6 +29,11 @@ const navList = [
   },
   {
     id: 3,
+    icon: FileBadge,
+    path: "/certificates",
+  },
+  {
+    id: 4,
     icon: HashIcon,
     path: "/tags",
   },

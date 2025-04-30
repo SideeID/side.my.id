@@ -1,0 +1,121 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { Image } from "astro:assets";
+
+const certificates = [
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/MSIB-terbaik-ezgif.com-optiwebp.webp?updatedAt=1737267889488",
+    title: "MSIB Best Performance Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/React-expert-ezgif.com-optiwebp.webp?updatedAt=1737267903802",
+    title: "React Expert Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/BE-Inagata-ezgif.com-optiwebp.webp?updatedAt=1737267844937",
+    title: "Backend Inagata Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/ciber-sec-ezgif.com-optiwebp.webp?updatedAt=1737267858986",
+    title: "Cyber Security Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/web-dev-bwi-ezgif.com-optiwebp.webp?updatedAt=1737267900314",
+    title: "Web Development BWI Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/web-dev-jbr-ezgif.com-optiwebp.webp?updatedAt=1737267896541",
+    title: "Web Development JBR Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/Karir-dev-ezgif.com-optiwebp.webp?updatedAt=1737267882051",
+    title: "Developer Career Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/Fundamental-web-react-ezgif.com-optiwebp.webp?updatedAt=1737267885539",
+    title: "Web React Fundamental Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/React-app-ezgif.com-optiwebp.webp?updatedAt=1737267878515",
+    title: "React App Development Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/Git-ezgif.com-optiwebp.webp?updatedAt=1737267893014",
+    title: "Git Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/BE-pemula-ezgif.com-gif-maker.webp?updatedAt=1737267855505",
+    title: "Backend Beginner Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/BE-pemula-ezgif.com-optiwebp.webp?updatedAt=1737267848449",
+    title: "Backend Beginner Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/FE-pemula-ezgif.com-optiwebp.webp?updatedAt=1737267875003",
+    title: "Frontend Beginner Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/Dasar-web-ezgif.com-optiwebp.webp?updatedAt=1737267866625",
+    title: "Web Basic Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/Dasar-js-ezgif.com-optiwebp.webp?updatedAt=1737267862523",
+    title: "JavaScript Basic Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/logic-ezgif.com-optiwebp.webp?updatedAt=1737267870177",
+    title: "Programming Logic Certificate"
+  },
+  {
+    url: "https://ik.imagekit.io/hrxp7yzjg/sertif/Dasar-pemrograman-ezgif.com-optiwebp.webp?updatedAt=1737267851939",
+    title: "Programming Basic Certificate"
+  }
+];
+---
+
+<Layout
+  title="Certificates"
+  description="Collection of my certificates, awards, and recognitions from various courses and accomplishments."
+  url="https://side.my.id/certificates"
+>
+  <div
+    class:list={[
+      "flex w-full flex-col items-start justify-start",
+      "md:text-start",
+    ]}
+  >
+    <section class="w-full">
+      <h1 data-cy="heading" class="mb-0">./certificates</h1>
+      <div class="slide-enter-content">
+        <p data-cy="description" class="mb-0 text-justify">
+          Collection of my certificates, awards, and recognitions from various courses and accomplishments.
+        </p>
+      </div>
+    </section>
+    <section
+      data-cy="certificates-list"
+      class="mt-8 grid w-full grid-cols-1 grid-rows-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 slide-enter-content"
+    >
+      {
+        certificates.map((certificate) => (
+          <div class="certificate-item flex flex-col">
+            <div class="aspect-[4/3] flex items-center justify-center overflow-hidden border border-monochrome-3 rounded-md bg-gray-100">
+              <Image
+                width={800}
+                height={600}
+                quality={90}
+                draggable={false}
+                format="webp"
+                src={certificate.url}
+                alt={certificate.title}
+                class="w-full h-auto object-contain transition-transform duration-300 hover:scale-105"
+              />
+            </div>
+            <p class="mt-2 text-sm text-center text-monochrome-5">{certificate.title}</p>
+          </div>
+        ))
+      }
+    </section>
+  </div>
+</Layout>
