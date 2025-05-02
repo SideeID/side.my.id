@@ -15,31 +15,31 @@ import { SENTRY_AUTH_TOKEN, SENTRY_DSN, SENTRY_PROJECT } from "./constants";
 
 export const integrations = [
   mdx({
-    syntaxHighlight: "shiki",
+    syntaxHighlight: 'shiki',
     shikiConfig: {
-      theme: "github-dark-default",
+      theme: 'dracula-soft',
     },
     remarkPlugins: [
-      [remarkToc, { heading: "toc" }],
+      [remarkToc, { heading: 'toc' }],
       remarkReadingTime,
       remarkSectionize,
     ],
     rehypePlugins: [rehypePresetMinify, rehypeSlug],
     remarkRehype: {
-      footnoteLabel: "Footnotes",
+      footnoteLabel: 'Footnotes',
     },
     gfm: true,
     optimize: true,
   }),
   sitemap({
-    changefreq: "weekly",
+    changefreq: 'weekly',
     priority: 1,
   }),
   compressor({
     gzip: true,
     brotli: true,
   }),
-  (await import("@playform/compress")).default(),
+  (await import('@playform/compress')).default(),
   svelte(),
   sentry({
     dsn: SENTRY_DSN,
