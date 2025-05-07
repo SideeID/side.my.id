@@ -5,6 +5,7 @@ import "@fontsource/geist-mono";
 import "@fontsource/ibm-plex-serif";
 import "@fontsource/noto-naskh-arabic";
 import { ClientRouter } from "astro:transitions";
+// import AskButton from "@/components/AskButton.astro";
 import "../index.css";
 
 type Props = {
@@ -51,5 +52,6 @@ const currentPath = Astro.url.pathname;
       <Footer />
     </div>
     <Navbar currentPath={currentPath} />
+    <!-- <AskButton /> -->
   </body>
 </html>
