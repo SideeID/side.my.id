@@ -2,7 +2,13 @@
   "ci": {
     "collect": {
       "startServerCommand": "npm run build && npm run start",
-      "url": ["https://side.my.id/"],
+      "url": [
+        "https://side.my.id/",
+        "https://side.my.id/notes/setup-cicd-pipeline-github-actions-laravel-cpanel",
+        "https://side.my.id/notes/how-to-make-whatsapp-bot-with-baileys",
+        "https://side.my.id/notes/mau-sampai-kapan-jadi-orang-misteriuss", 
+        "https://side.my.id/works/library-filter-kata-kata-kotor"
+      ],
       "numberOfRuns": 3
     },
     "upload": {

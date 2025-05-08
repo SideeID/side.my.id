@@ -1,9 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import {
-  AlbumIcon,
   HashIcon,
-  ImagesIcon,
   ListIcon,
   NotepadTextIcon,
   FileBadge
@@ -57,15 +55,15 @@ const navList = [
         currentPath === "/" ? "bg-monochrome-3 rounded-full" : ""
       )}
     >
-      <Image
-        class="rounded-full h-6 w-6 object-cover photos"
+      <img
+      src="https://avatars.githubusercontent.com/u/132200554?v=4&s=48"
         alt="Github Profile"
-        width={500}
-        height={500}
-        quality={100}
-        draggable={false}
-        format="avif"
-        src="https://avatars.githubusercontent.com/u/132200554?v=4"
+        width="48"
+        height="48"
+        class="rounded-full h-6 w-6 object-cover"
+        loading="eager"
+        decoding="async"
+        draggable="false"
       />
     </button>
   </a>
