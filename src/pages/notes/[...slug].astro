@@ -3,6 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import { format } from "date-fns";
 import { ArrowLeftIcon } from "lucide-svelte";
+import { Image } from "astro:assets";
 
 export async function getStaticPaths() {
   const notesEntries = await getCollection("notes");
@@ -40,11 +41,11 @@ const { Content, remarkPluginFrontmatter, headings } = await item.render();
     <h1 class="mt-4">{item.data.title}</h1>
     <div class="flex w-full items-center space-x-2">
       <div class="rounded-full!">
-        <img
-          src="https://avatars.githubusercontent.com/u/132200554?v=4&s=48"
+        <Image
+          src="/avatar.webp"
           alt="SideID"
-          width="48"
-          height="48"
+          width={28}
+          height={28}
           class="h-7 w-7 rounded-full"
           loading="eager"
         />

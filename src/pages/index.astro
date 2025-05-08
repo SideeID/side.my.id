@@ -29,15 +29,15 @@ const [notesList, worksList] = await Promise.all([
           class="bg-monochrome-3 hidden md:block -rotate-3! p-1.5 rounded-md w-[500px] h-fit"
         >
           <Image
-            src="https://avatars.githubusercontent.com/u/132200554?v=4"
-            alt="Github Profile"
-            width={500}
-            height={500}
-            quality={100}
-            draggable={false}
-            format="avif"
-            class="photos w-36! my-0! border-none! object-cover"
-          />
+          src="/avatar.webp"
+          alt="Github Profile"
+          width={500}
+          height={500}
+          quality={100}
+          draggable={false}
+          class="photos w-36! my-0! border-none! object-cover"
+          loading="eager"
+        />
         </div>
         <div>
           <h2 data-cy="name" class="mb-0! mt-0!">Dimas Fajar Katon Prayogo</h2>
