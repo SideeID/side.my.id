@@ -1,0 +1,247 @@
+---
+author: SideID
+title: Nginx Server Setup Tutorial Docker Edition
+tags:
+  - nginx
+  - docker
+created_at: 2025-05-19
+description: A comprehensive guide to setting up an Nginx server using Docker, including configuration and deployment steps.
+---
+
+## Introduction
+
+Yo, server warriors! 👋 Ever felt like smashing your laptop just because setting up Nginx for your Docker project is a pain in the neck? Especially when SSL comes into play—supposed to be easy, but suddenly your brain's overheating. You’ve hustled hard to get your app running in Docker, but when it’s time to go public, boom, stuck at Nginx. Annoying as hell, right?
+
+Chill, bro! In this note, I’ll show you step-by-step how to make Nginx your Docker app’s personal bouncer, so the whole world can access your masterpiece. And of course, we’ll slap on SSL so your site doesn’t look like it’s from the stone age (seriously, no padlock? Come on, man!). Real case study: your app’s running on Docker port 3000, Nginx stands guard in front. Easy, no drama, and guaranteed not to make you cry!
+
+So, grab your coffee, brace yourself, and let’s roll!
+
+## Prerequisites
+
+- A Linux server (i'm using ubuntu, but any distro will Do)
+- Docker installed
+- Docker Compose installed
+- Basic knowledge of Docker and Nginx
+- Domain name (optional, but recommended for SSL)
+- A Docker container running yout app (e.g., Node.js, Python, etc.)
+- About 30 minutes of your time (and maybe a coffe or two or three ☕)
+
+## Step 1: Install Nginx
+
+first things first - let's get Nginx installed on our server.
+
+```bash
+sudo apt update
+sudo apt install -y nginx
+```
+
+Once installed, make sure Nginx is running:
+
+```bash
+sudo systemctl status nginx
+```
+
+Your should see something like "active (running)". If not, start it with:
+
+```bash
+sudo systemctl start nginx
+```
+
+## Step 2: Create Nginx Configuration file
+
+Now, let's create a configuration file for Nginx. We'll set it up a new config file for our fomain:
+
+```bash
+sudo nano /etc/nginx/sites-avaliable/yourdomain.com
+```
+
+Replace `yourdomain.com` with your actual domain name. If you don't have a domain, you can use your server's IP address.
+Here's a basic configuration to get you started:
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+
+    access_log /var/log/nginx/yourdomain_access.log;
+    error_log /var/log/nginx/yourdomain_error.log;
+
+    location / {
+        proxy_pass http://localhost:3000; # Change this to your appp's port
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        # Cloudflare headers (useful even if you're not using Cloudflare)
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Optional: Set a timeout for the proxy connection
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+}
+```
+
+Let me break down what this config does:
+- **listen 80;**: This tells Nginx to listen on port 80 (HTTP).
+- **server_name yourdomain.com www.yourdomain.com;**: This specifies the domain names that this server block will respond to.
+- **access_log** and **error_log**: These lines specify where to log access and error messages.
+- **location /**: This block defines how to handle requests to the root URL.
+- **proxy_pass http://localhost:3000;**: This line tells Nginx to forward requests to your app running on port 3000.
+- **proxy_set_header**: These lines set various headers to pass along to your app. This is important for things like WebSocket connections and getting the real IP address of the client.
+- **proxy_connect_timeout**, **proxy_send_timeout**, and **proxy_read_timeout**: These lines set timeouts for the proxy connection. You can adjust these values based on your app's needs.
+- **Cloudflare headers**: These headers are useful if you're using Cloudflare as a CDN, but even if you're not, they can help with things like getting the real IP address of the client.
+
+## Step 3: Enable the Site 
+Now that we have our configuration file, we need to enable it. Create a symbolic link to the `sites-enabled` directory:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/yourdomain.com /etc/nginx/sites-enabled/
+```
+
+Now test if our Nginx config has any syntax errors:
+
+```bash
+sudo nginx -t
+```
+
+If everything looks good, restart Nginx to apply the changes:
+
+```bash
+sudo systemctl restart nginx
+```
+At this point, your site should be accessible via HTTP (port 80). Give it a quick check before we move to SSL!
+
+## Step 4: SSL Setup with Certbot
+
+Now let's get that sweet, sweet padlock icon by setting up SSL. We'll use Certbot because it's free and super easy:
+
+```bash
+# Install Certbot and the Nginx plugin
+sudo apt install -y certbot python3-certbot-nginx
+
+# Get SSL certificates and auto-configure Nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+```
+
+Follow the prompts (usually just providing your email and agreeing to terms). When asked if you want to redirect HTTP to HTTPS, I recommend selecting option 2 for redirect - security first, folks!
+
+After running Certbot, it will:
+- Obtain the SSL certificate from Let's Encrypt.
+- Automatically configure Nginx to use the SSL certificate.
+- Set up renewal hooks so your cert stays fresh.
+
+Your config file should now look something like this (Certbot adds the SSL stuff):
+
+```nginx
+server {
+    server_name yourdomain.com www.yourdomain.com;
+
+    # Original config stuff...
+    access_log /var/log/nginx/yourdomain.access.log;
+    error_log /var/log/nginx/yourdomain.error.log;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        # All the proxy settings from before...
+    }
+
+    # SSL settings added by Certbot
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+# HTTP to HTTPS redirect
+server {
+    if ($host = www.yourdomain.com) {
+        return 301 https://$host$request_uri;
+    }
+
+    if ($host = yourdomain.com) {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    return 404;
+}
+```
+
+Test things again to make sure no syntax errors slipped in:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+## Alternative: SSL with Cloudflare
+
+Not feeling the Certbot vibes? No worries - Cloudflare is another awesome option. Instead of managing SSL certs yourself, you can use Cloudflare as a proxy with their SSL:
+
+1. Sign up for a Cloudflare account and add your domain.
+2. Add Your domain and update your nameservers to point to Cloudflare.
+3. In the Cloudflare dashboard, go to the SSL/TLS tab and set the SSL mode to "Full" or "Full (strict)".
+
+For "Full (Strict)" mode, you'll still need a cert on your server. But the "Flexible" mode is super easy - it handles SSL between users and Cloudflare, while the connection between Cloudflare and your server can stay on HTTP.
+
+Your Nginx config already has the needed Cloudflare headers:
+
+```nginx
+# These headers are already in your config
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+```
+
+These headers are absolutely crucial when using Cloudflare because:
+- They make sure your app knows the real visitor IP (not just Cloudflare's)
+- They properly pass protocol info so your app can build URLs correctly
+- They maintain compatibility with security frameworks that check request origins
+
+## Troubleshooting
+
+it a snag? Here are some common issues and fixes:
+
+**502 Bad Gateway**
+
+This usually means Nginx can't reach your Docker container. Check:
+- Is your container running? `docker ps`
+- Is it exposing port 3000? `docker port your-container-name`
+- Is your app listening on the right port? Check your app's config.
+- Can you reach it directly? `curl http://localhost:3000`
+
+**SSL Certificate Not Working**
+
+- Check if Certbot created the certs: `ls -l /etc/letsencrypt/live/yourdomain.com/`
+- Verify Nginx is reading the right files (check paths in the config)
+- Restart Nginx: `sudo systemctl restart nginx`
+
+**Connection Refused**
+
+- Check if Nginx is running: `sudo systemctl status nginx`
+- Check if your firewall is blocking port 80/443: `sudo ufw status`
+- If using a cloud provider, check their security groups/firewall rules
+
+## Conclusion
+
+Boom! 🎉 You've just set up a rock-solid Nginx server with Docker and SSL! Your app is now:
+
+- Running behind a proper reverse proxy
+- Secured with SSL (either via Certbot or Cloudflare)
+- Properly logging all access for troubleshooting
+- Configured with correct headers for IP forwarding
+- Ready to handle WebSocket connections
+
+This setup has served me well across dozens of projects, from small personal sites to production apps handling thousands of users. The best part is that once you've done this a few times, you can set up new projects in about 5 minutes flat!
+
+Remember that the web server is your app's bouncer - it's the first line of defense and critical to performance. A well-configured Nginx setup like this one will keep your Docker apps running smoothly and securely.
+
+Got questions or hit a snag? Feel free to drop them in the comments below! Happy coding! ✌️
