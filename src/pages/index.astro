@@ -40,7 +40,9 @@ const [notesList, worksList] = await Promise.all([
         />
         </div>
         <div>
-          <h2 data-cy="name" class="mb-0! mt-0!">Dimas Fajar Katon Prayogo</h2>
+          <h2 data-cy="name" class="mb-0! mt-0!">
+            Dimas Fajar Katon Prayogo [<abbr title="He/Him">he/him</abbr>]
+          </h2>
             <p data-cy="description" class="mb-0! mt-2 text-justify text-base-0">
             Konnichiwa! I'm Dimas. You can call me <b>Dimas/Dim/Mas</b>. I'm a Developer based in
             Indonesia, also amateur badminton player in my free time. Day-to-day,
@@ -125,7 +127,7 @@ const [notesList, worksList] = await Promise.all([
       </div>
     </section>
     <section data-cy="featured-notes" class="mt-8 w-full">
-      <h2 class="mt-0 mb-6 font-extrabold">Latest Notes</h2>
+      <h2 class="mt-0 mb-6 font-extrabold">Featured Notes</h2>
       <div class="grid w-full grid-cols-1 grid-rows-1 gap-4 sm:grid-cols-2">
         {
           notesList
