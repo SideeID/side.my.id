@@ -31,7 +31,7 @@ const worksList = await getCollection("works");
     >
       {
         worksList
-          .sort((a, b) => a.data.id - b.data.id)
+          .sort((a, b) => b.data.id - a.data.id)
           .map((item) => (
             <Card
               slug={item.slug}

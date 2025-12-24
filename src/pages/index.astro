@@ -129,7 +129,7 @@ const [notesList, worksList] = await Promise.all([
       >
         {
           worksList
-            .sort((a, b) => a.data.id - b.data.id)
+            .sort((a, b) => b.data.id - a.data.id)
             .slice(0, 4)
             .map((item) => (
               <Card
