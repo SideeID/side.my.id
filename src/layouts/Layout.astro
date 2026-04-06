@@ -1,6 +1,7 @@
 ---
 import Footer from "@/components/Footer.astro";
 import Navbar from "@/components/Navbar.astro";
+import Analytics from "@vercel/analytics/astro";
 import "@fontsource/geist-mono";
 import "@fontsource/ibm-plex-serif";
 import "@fontsource/noto-naskh-arabic";
@@ -53,5 +54,6 @@ const currentPath = Astro.url.pathname;
     </div>
     <Navbar currentPath={currentPath} />
     <!-- <AskButton /> -->
+    <Analytics />
   </body>
 </html>
