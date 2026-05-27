@@ -1,14 +1,14 @@
 ---
-id: 26
+date: "2026-05-26"
 author: SideID
-thumbnail: https://ik.imagekit.io/hrxp7yzjg/projects/neoside-chat.jpeg?updatedAt=1775476185995
+thumbnail: https://ik.imagekit.io/hrxp7yzjg/projects/neoside-mockup.png
 title: Neoside - Smart Finance System for Personal Wealth Management
 stack:
   - flutter
   - deno
   - hono
   - langchain
-description: AI-powered personal finance management application combining mobile-first design with intelligent financial insights. Features real-time transaction tracking, AI-based financial analysis with smart roasting mode, budget management, and multi-device synchronization.
+description: Personal finance management application combining mobile-first design with intelligent financial insights. Features real-time transaction tracking, AI-based financial analysis with smart roasting mode, budget management, and multi-device synchronization.
 ---
 
 <div style='display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;'>
@@ -56,118 +56,110 @@ description: AI-powered personal finance management application combining mobile
   />
 </div>
 
-Neoside is a comprehensive AI-powered personal finance management system designed to help users take control of their finances through intelligent automation, real-time analytics, and personalized financial guidance. The platform combines mobile-first design with professional web-based dashboard capabilities.
+Neoside is your personal finance companion that gets your money habits—literally. It's an AI-powered app that tracks expenses, analyzes spending patterns, and gives you honest (sometimes brutally honest) feedback on how you're doing financially. Think of it as having a smart financial advisor in your pocket, available whenever you need it.
 
-## Overview
+## The Problem It Solves
 
-Neoside addresses the challenge of modern personal finance management by providing an integrated platform where users can track expenses, analyze spending patterns, and receive AI-driven financial recommendations all in one place. The system intelligently adapts based on user authentication status while maintaining seamless data synchronization across devices.
+Managing personal finances is a mess. You have transactions scattered everywhere, you're not sure where your money's actually going, and getting meaningful insights usually means complicated spreadsheets. Neoside brings all of this together in one beautifully designed app that syncs across your phone, tablet, and desktop.
 
-## Key Features
+## What Makes It Special
 
-### Financial Tracking and Management
+### Real Transaction Tracking
 
-Comprehensive transaction management with complete history and categorization. Track all income and expenses with detailed records and filtering capabilities.
+See every rupiah coming in and going out. Categorize transactions automatically, filter by date range, and get a complete history of your financial activity. No more wondering where the money went.
 
-### AI-Powered Financial Insights
+### AI That Actually Talks Back
 
-Intelligent financial analysis with two distinct modes. Normal mode provides professional and constructive analysis, while roasting mode delivers witty but honest critique of spending habits. Context-aware recommendations based on user behavior.
+The app has two distinct AI modes. **Normal mode** gives you professional financial analysis with constructive insights. **Roasting mode** is the fun part—it delivers witty, honest critique of your spending habits. Both modes give context-aware recommendations based on your actual behavior, not generic financial advice.
 
-### Budget and Expense Management
+### Smart Budget Control
 
-Create and monitor budgets across different spending categories. Track bills and upcoming payments with notification reminders. Manage debt and loan tracking with repayment analysis.
+Set budgets for different spending categories and watch your progress in real time. Get alerts when you're approaching your limits so there are no surprises. Track bills and upcoming payments with smart reminders so nothing slips through the cracks.
 
-### Financial Analysis Tools
+### Deep Financial Analysis
 
-Multi-month comparison showing differences between current month income and expenses versus previous months. Detailed spending breakdown by category. Trend analysis for identifying spending patterns.
+Compare this month's spending against previous months to see trends. Break down expenses by category to identify where your money's actually going. Spot patterns in your spending habits and understand your financial behavior at a glance.
 
-### Financial Calculator
+### Built-In Financial Calculator
 
-Built-in calculator for quick financial computations. Support for compound interest calculations, loan amortization, and investment projections.
+Quick calculations for compound interest, loan amortization, investment projections, and more. Do your financial math without switching apps.
 
-### Financial Reports
+### Export Reports Anytime
 
-Export financial statements in multiple formats. Comprehensive reports for budgeting and financial planning.
+Pull comprehensive financial reports in multiple formats. Share reports with accountants, financial advisors, or just keep them for your personal records.
 
-### Smart Notifications
+### Smart Alerts That Matter
 
-Alert system for bill due dates and payment reminders. Budget threshold notifications when approaching limits. Irregular spending alerts for unusual transactions.
+Never miss a bill payment again. Get notified about upcoming due dates, unusual spending, and budget warnings. Alerts are smart enough to not spam you—they only notify you when it matters.
 
-### Financial Education
+### Learn Better Money Habits
 
-Curated tips and best practices for personal finance management. Contextual advice based on user's spending patterns. Educational content for building financial literacy.
+Personalized financial tips based on your actual spending patterns. Educational content that helps you understand personal finance without the jargon. Advice that's contextual to your situation, not one-size-fits-all.
 
-### Multi-Device Synchronization
+### Works Everywhere, Online or Offline
 
-Offline-first architecture with local storage for unauthenticated users. Cloud synchronization for authenticated users across all devices. Professional web-based dashboard for desktop access and detailed analysis.
+Use the app on your phone without internet—everything syncs locally. Sign in and your data syncs across all your devices automatically. Access your full dashboard on desktop for deeper analysis. Perfect whether you're at home or on the go.
 
-## Technical Architecture
+## How It's Built
 
-### Mobile Frontend
+### Mobile First
 
-Flutter for cross-platform mobile development. Native performance with modern UI patterns. Offline-first app architecture with local storage capabilities.
+Built with Flutter for a smooth, native-like experience on both iOS and Android. The app works offline so you can track expenses anytime, anywhere, with or without internet.
 
-### Backend and API
+### Fast Backend
 
-Deno for fast and secure server runtime. Hono micro web framework for lightweight API endpoints. Type-safe API development with TypeScript throughout.
+Powered by Deno runtime for security and speed, with Hono as the lightweight web framework. All APIs are type-safe with TypeScript, so fewer bugs reach production.
 
-### AI and Analytics
+### Intelligent Financial AI
 
-LangChain integration for advanced AI-powered financial analysis. Intelligent insights generation with multiple analysis modes. Natural language processing for financial conversation and recommendations.
+LangChain powers the AI engine that analyzes your spending and generates insights. The system learns from your patterns and adapts its analysis modes to give you exactly what you need to hear.
 
-### Data Management
+### Data Stays Safe
 
-Local storage for offline data persistence. Cloud database synchronization for authenticated users. Data encryption for security and privacy.
+Data is encrypted and syncs securely between your devices. You own your data—it's stored locally first, then synced to the cloud when you're connected. No surprises, no data loss.
 
-## Architecture Highlights
+## What Made This Project Interesting
 
-### Offline-First Design
+### Offline-First Was Non-Negotiable
 
-Non-authenticated users can access all core features with data stored locally. Seamless transition to cloud storage upon authentication.
+The app needed to work perfectly without internet—no excuses. We built local storage that's smart enough to merge changes when you go back online, without losing or duplicating data.
 
-### Cross-Platform Experience
+### Sync Across Everything
 
-Consistent experience across mobile and web platforms. Data synchronization ensures users can switch between devices without friction.
+Your phone, tablet, and desktop all stay in sync. Switch devices mid-task and everything's there waiting for you. That level of seamlessness isn't trivial to build.
 
-### Professional Dashboard
+### Type Safety as First-Class Citizen
 
-Web-based dashboard for detailed financial analysis and reporting. Advanced filtering and export capabilities. Multi-month and multi-year historical analysis.
+End-to-end TypeScript from the Deno backend to the Flutter frontend. Strict typing catches bugs before they become problems.
 
-### AI-Driven Insights
+### AI Analysis That Adapts
 
-Two-mode AI analysis system adapting to user preferences. Context-aware recommendations based on spending behavior. Pattern recognition for identifying financial trends.
+Building an AI system that can switch between professional and witty analysis modes was fun but challenging. The system had to understand context deeply enough to give relevant advice in both modes.
 
-## Technical Challenges and Solutions
+## The Engineering Behind The Scenes
 
-### Offline Data Persistence
+### Keeping Data in Sync
 
-Challenge: Maintaining data integrity while working offline and syncing with cloud storage.
+The tricky part: syncing offline changes with the cloud without losing data or creating conflicts. We implemented intelligent conflict resolution based on timestamps and bidirectional updates.
 
-Solution: Implemented robust local storage architecture with conflict resolution and data verification during synchronization.
+### Making AI Contextually Smart
 
-### AI Analysis Variety
+Generating relevant financial insights across different analysis modes required building flexible AI pipelines with mode-specific prompts. Each mode had to feel natural, not like it's reading from a script.
 
-Challenge: Generating contextually relevant financial insights across different analysis modes.
+### Real-Time Sync Across Devices
 
-Solution: Developed flexible AI pipeline using LangChain with mode-specific prompts and response formatting.
+Ensuring data consistency when the same user accesses the app from multiple devices simultaneously. We built a comprehensive sync engine that resolves conflicts intelligently without requiring user intervention.
 
-### Real-Time Synchronization
+### TypeScript from End to End
 
-Challenge: Ensuring data consistency across multiple devices and web platform.
+Deno's native TypeScript support with strict configuration gave us compile-time safety across the entire stack. Fewer runtime surprises, more predictable code.
 
-Solution: Built comprehensive sync engine with timestamp-based conflict resolution and bidirectional data updates.
+## Why This Matters
 
-### Type Safety in Deno
+Neoside shows how modern tech can solve real problems. Personal finance doesn't have to be boring or intimidating. By combining beautiful design with intelligent AI, the app helps people actually understand their spending and make better financial decisions.
 
-Challenge: Maintaining end-to-end type safety with Deno and TypeScript.
-
-Solution: Leveraged Deno's native TypeScript support with strict configuration for compile-time safety.
-
-## Project Impact
-
-Neoside empowers users to make smarter financial decisions through the combination of advanced technology and personalized AI insights. By removing barriers to financial management and providing actionable recommendations, Neoside helps users achieve their financial goals and develop better money management habits.
-
-The project demonstrates expertise in full-stack development across mobile and web platforms, AI integration, and building sophisticated financial applications that serve real user needs.
+The project demonstrates how to build sophisticated financial apps that work offline and online seamlessly, with AI that's helpful without being creepy. It's the kind of tool people genuinely want to use because it makes managing money less of a chore and more of a conversation with someone who actually gets it.
 
 ---
 
-For demo requests and collaboration inquiries, contact via Instagram side\_\_id
+Interested in financial apps, AI integration, or full-stack development? Let's talk! 🚀

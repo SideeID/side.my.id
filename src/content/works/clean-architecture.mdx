@@ -1,0 +1,228 @@
+---
+date: "2026-05-14"
+author: SideID
+thumbnail: https://ik.imagekit.io/hrxp7yzjg/projects/CleanArchitecture.jpg
+title: Clean Architecture - Backend Expert Learning Project
+stack:
+  - nodejs
+  - express
+  - postgresql
+  - jest
+  - clean-architecture
+  - dependency-injection
+  - tdd
+repo: https://github.com/SideeID/clean-architecture
+description: A comprehensive implementation of Uncle Bob's Clean Architecture principles for Node.js, demonstrating proper separation of concerns, testability, and maintainability in backend development.
+---
+
+<img
+  src='https://ik.imagekit.io/hrxp7yzjg/projects/CleanArchitecture.jpg'
+  alt='Clean Architecture - Layer Structure'
+  fetchPriority='high'
+/>
+
+Most backend code starts clean. Then features pile up. Dependencies scatter everywhere. One change breaks three things. Testing becomes a nightmare. The codebase that was supposed to be maintainable becomes unmaintainable.
+
+Clean Architecture fixes this from the ground up.
+
+This project isn't about building a feature. It's about learning to build systems that stay maintainable, testable, and scalable—no matter how much complexity gets added. It's Uncle Bob's Clean Architecture principles, implemented in Node.js, with every layer properly separated and every responsibility clearly defined.
+
+## What Clean Architecture Actually Is
+
+Clean Architecture isn't one thing—it's a philosophy about how to organize code so that:
+
+1. **Business logic lives in the center** – Far away from frameworks, databases, and UI concerns
+2. **Dependencies point inward** – Nothing at the core depends on outer layers
+3. **Each layer has one reason to change** – Separation of concerns isn't optional
+4. **Testability is built-in** – Not bolted on after the fact
+5. **Frameworks are swappable** – Switch Express for Fastify? Change PostgreSQL? No problem
+
+## The Layers
+
+### Domain Layer (The Core)
+
+The innermost layer. Here lives the business logic that doesn't know about frameworks or databases.
+
+**Entities** – The core business objects. `RegisterUser` and `RegisteredUser` represent registration concepts at the business level, not the database level. They contain validation rules, business constraints, pure domain logic.
+
+**Repositories** – Abstract interfaces defining how data flows in and out. `UserRepository` is just a contract—it says "users can be added and retrieved" without caring how.
+
+What goes here:
+
+- Business rules
+- Entity definitions
+- Repository interfaces
+- Domain exceptions
+
+What NEVER goes here:
+
+- Database code
+- Framework-specific imports
+- HTTP concerns
+
+### Applications Layer
+
+The bridge between domains and infrastructure. Contains use cases—the orchestration of business logic.
+
+**Use Cases** – `AddUserUseCase` coordinates the domain, security, and repository layers. It says "to add a user, validate input, hash the password, call the repository." Pure orchestration, no business logic creation.
+
+**Security** – The `PasswordHash` interface defines the contract. The implementation lives in Infrastructure, but this layer knows the abstraction.
+
+**Testing** – Each use case is testable without touching databases or HTTP. You mock the repository, mock the password hasher, test the flow.
+
+What goes here:
+
+- Use case orchestration
+- Application-level exceptions
+- Security interfaces
+
+What NEVER goes here:
+
+- Database implementations
+- HTTP handlers
+- Framework-specific code
+
+### Infrastructure Layer
+
+Where the rubber meets the road. Implementations of domain contracts, database connections, third-party services.
+
+**Database** – `UserRepositoryPostgres` implements the `UserRepository` interface. It knows how to talk to PostgreSQL, but that knowledge stays here. Change to MongoDB? Create `UserRepositoryMongo`, the domain doesn't care.
+
+**Security** – `BcryptPasswordHash` implements the `PasswordHash` interface. Bcrypt lives here, not in the domain.
+
+**Dependency Injection Container** – `container.js` wires everything together. Every dependency is explicitly declared, testable, and swappable.
+
+What goes here:
+
+- Database implementations
+- External service integrations
+- Framework setup
+- Configuration
+
+What NEVER goes here:
+
+- Business logic
+- Use cases
+- Request handling
+
+### Interfaces Layer
+
+The outermost layer. HTTP handlers, request routing, response formatting.
+
+**HTTP Handlers** – `handler.js` receives an HTTP request, validates input, calls the use case, returns a response. That's it. No business logic, no database access.
+
+**Routes** – `routes.js` defines the API endpoints. Purely framework concern.
+
+**Request/Response Mapping** – Converting HTTP format to domain format and back.
+
+What goes here:
+
+- HTTP handlers
+- Routing
+- Request/response adaptation
+- API documentation
+
+What NEVER goes here:
+
+- Business logic
+- Database logic
+- Use case orchestration
+
+## How Dependencies Flow
+
+```
+Interfaces (HTTP)
+  ↓
+Applications (Use Cases)
+  ↓
+Domains (Business Logic)
+```
+
+**Dependency Rule: Dependencies always point inward. The core never knows about the shell.**
+
+Interfaces depend on Applications. Applications depend on Domains. But Domains depend on NOTHING. This means:
+
+- Change HTTP from Express to Fastify? Only Interfaces change
+- Swap PostgreSQL for MongoDB? Only Infrastructure changes
+- Add Redis caching? Create new Infrastructure, Applications orchestrate it
+
+## Testing Strategy
+
+**Domain Layer** – Pure unit tests. No mocks needed (there's nothing to mock). Test that `RegisterUser` validates correctly, that `RegisteredUser` enforces business rules.
+
+**Applications Layer** – Test use cases with mocked repositories and security implementations. Test that `AddUserUseCase` orchestrates correctly without touching the database.
+
+**Infrastructure Layer** – Test implementations against the database. Test that `UserRepositoryPostgres` correctly stores and retrieves users.
+
+**Interfaces Layer** – Integration tests through HTTP. Test that handlers receive requests, call use cases, return responses.
+
+Every layer has its own `_test` folder. Tests live alongside the code. TDD is built-in.
+
+## Project Structure
+
+```
+Domains/
+  ├─ Define what the business does
+  └─ Pure, framework-agnostic
+
+Applications/
+  ├─ Orchestrate use cases
+  ├─ Wire up security
+  └─ Testable without infrastructure
+
+Infrastructures/
+  ├─ Implement domain contracts
+  ├─ Database access
+  └─ Third-party services
+
+Interfaces/
+  ├─ HTTP endpoints
+  └─ Request/response mapping
+
+Commons/
+  ├─ Shared exceptions
+  └─ Configuration
+```
+
+## Why This Matters
+
+**For Maintainability** – When you need to change something, you know exactly where to look. Business logic is centralized. Infrastructure details don't leak everywhere.
+
+**For Testing** – You can test business logic without databases. Test use cases without servers. Fast, reliable tests.
+
+**For Growth** – Adding features doesn't mean refactoring everything. New use cases slot in cleanly. New repositories implement existing interfaces. The system grows, it doesn't collapse.
+
+**For Teams** – Different teams can work on different layers independently. Frontend can wait for Infrastructure to finish. Use cases are clear contracts.
+
+**For Swapping** – Switch databases? Change frameworks? The core logic is untouched. This is powerful. This is why Clean Architecture exists.
+
+## Key Principles In This Project
+
+**Dependency Inversion** – High-level modules don't depend on low-level modules. Both depend on abstractions (`UserRepository` is the abstraction, `UserRepositoryPostgres` is the concrete implementation).
+
+**Single Responsibility** – Each class, each layer has one reason to change. `PasswordHash` hashes passwords. `UserRepository` manages users. Nothing does both.
+
+**Open/Closed Principle** – Open for extension, closed for modification. Need new password hashing? Implement the interface. Don't modify `PasswordHash`.
+
+**Stable Abstractions** – Inner layers are abstract (interfaces). Outer layers are concrete (implementations). Change details on the outside, abstract contracts stay stable on the inside.
+
+## What You Learn Here
+
+- How to structure a Node.js backend for scale
+- The power of abstractions and interfaces
+- How to make code testable by design
+- Dependency injection and inversion of control
+- Where business logic actually belongs
+- Why frameworks are tools, not solutions
+- How to grow a codebase without it rotting
+
+## Get Started
+
+Explore the repository at [github.com/SideeID/clean-architecture](https://github.com/SideeID/clean-architecture)
+
+Study the structure. Read the tests. See how each layer knows only what it needs to know. This is how expert backend development looks.
+
+---
+
+**Clean Architecture – The difference between code that works and code that lasts.**
+

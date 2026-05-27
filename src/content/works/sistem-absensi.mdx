@@ -1,0 +1,108 @@
+---
+date: "2026-05-20"
+author: SideID
+thumbnail: https://ik.imagekit.io/hrxp7yzjg/projects/go-fiber.png
+title: Sistem Absensi - GPS-Based Student Attendance System
+stack:
+  - golang
+  - fiber
+  - react-native
+  - mongodb-atlas
+  - jwt-authentication
+  - gps-geofencing
+repo: https://github.com/SideeID/go-fiber-auth-api
+api-docs: https://1ftn4i1z61.apidog.io/
+description: Enterprise-grade attendance system combining GPS geofencing, mobile security, and biometric authentication to ensure reliable, tamper-proof student check-ins.
+---
+
+<img
+  src='https://ik.imagekit.io/hrxp7yzjg/projects/go-fiber.png'
+  alt='Sistem Absensi - API Architecture'
+  fetchPriority='high'
+/>
+
+Teachers know the ritual.Roll call every morning. Students marking "present" without actually being there. Lost notebooks with attendance records. Gaps in data when you need it most.
+
+Sistem Absensi fixes that. Using GPS, mobile security, and real-time validation, it makes attendance automatic, verifiable, and impossible to fake. Students check in with their phones, the system validates they're actually at school, and you get accurate data—every single day.
+
+## How It Works
+
+**Check In, Get Verified**
+
+Students open the app and tap check-in. Their GPS location is validated in real-time against the school's boundaries using precise Haversine distance calculations. No radius fudging—they have to be at school. If they are, check-in confirmed. If not, the system politely says "nice try."
+
+**Multiple Security Layers**
+
+Just GPS isn't enough. The system also validates:
+
+- **Network Security** – Is their phone connected via school WiFi or cellular? Detects and blocks VPN abuse.
+- **Device Security** – Is the phone rooted or jailbroken? Can it detect if someone's screenshot cheating? Check and check.
+- **Biometric Verification** – Optional fingerprint or face ID for extra verification.
+- **Device Fingerprinting** – Tracks IMEI and device ID to prevent the same phone checking in multiple people.
+
+**Real Attendance Records**
+
+Every check-in is timestamped, location-verified, and stored. Students and teachers can see:
+
+- Real-time check-in status
+- Complete attendance history
+- Attendance statistics and trends
+- Absence patterns that matter
+
+## What Makes It Solid
+
+**Backend Built for Scale**
+
+Golang with Fiber framework—fast, minimalist, reliable. MongoDB Atlas for cloud storage. JWT tokens for stateless authentication that doesn't slow down. Docker for deployment that just works.
+
+**Mobile Built for Security**
+
+React Native with Expo, so it works on both iOS and Android. But security-first: certificate pinning on API calls, root/jailbreak detection, screen recording prevention, auto-logout after idle sessions. Multi-factor authentication options including biometric.
+
+**GPS That Actually Works**
+
+Real-time location tracking with geofencing boundaries around the school. The system calculates exact distances, validates Indonesian territory, and adjusts for network conditions. Even works offline—records sync when connection returns.
+
+## For Students
+
+Open app → Tap check-in → Done. The system handles everything else silently in the background. They can see their attendance history anytime, and the biometric option means they don't need another password to remember.
+
+## For Schools
+
+Accurate attendance data. No more missing records. No more "I don't know if they were here." Export reports, track trends, identify patterns. Real data for real decision-making.
+
+## For Administrators
+
+Centralized dashboard. Real-time monitoring. Attendance analytics. Automatic alerts for patterns (chronic absenteeism, possible system abuse, etc.). Everything organized and accessible.
+
+## Tech That Powers It
+
+**Backend**
+
+- Go (Golang) – Fast, concurrent, reliable
+- Fiber Framework – Minimal overhead, maximum speed
+- MongoDB Atlas – Cloud database that scales
+- JWT Authentication – Token-based security without session overhead
+- Haversine Formula – Precise GPS distance calculations
+- Docker – Consistent deployment everywhere
+
+**Mobile**
+
+- React Native Expo – Single codebase, both iOS and Android
+- Advanced GPS integration – Real-time tracking and geofencing
+- Biometric authentication – Fingerprint and Face ID support
+- Comprehensive device security – Root detection, app tampering detection, certificate pinning
+- Network security validation – WiFi and VPN detection
+
+## Links
+
+**Mobile Repository:** [github.com/SideeID/Sistem-Absensi](https://github.com/SideeID/Sistem-Absensi)
+
+**Backend Repository:** [github.com/SideeID/go-fiber-auth-api](https://github.com/SideeID/go-fiber-auth-api)
+
+**API Documentation:** [API Docs](https://1ftn4i1z61.apidog.io/)
+
+---
+
+**Sistem Absensi – Accurate attendance. No shortcuts. No fakes. Just data.**
+
