@@ -1,19 +1,18 @@
 /**
  * A function to read all image files from user's specified directory
  * @export
- * @param {string} filesDir
  * @param {RegExp} pattern
  * @returns {*}
  */
-export function readImages(filesDir: string, pattern: RegExp) {
+export function readImages(_filesDir: string, pattern: RegExp) {
   const imageFiles = import.meta.glob(
-    "/public/images/photos/**/*.(png|jpg|jpeg|gif|webp)"
+    '/public/images/photos/**/*.(png|jpg|jpeg|gif|webp)',
   );
 
   const images = Object.entries(imageFiles)
     .map(([path, importFunc]) => {
-      const fileName = path.split("/").pop() || "";
-      const urlPath = path.replace("/public", "");
+      const fileName = path.split('/').pop() || '';
+      const urlPath = path.replace('/public', '');
 
       return {
         fileName,
@@ -24,8 +23,8 @@ export function readImages(filesDir: string, pattern: RegExp) {
     })
     .sort(
       (a, b) =>
-        Number(a.fileName.replace(pattern, "")) -
-        Number(b.fileName.replace(pattern, ""))
+        Number(a.fileName.replace(pattern, '')) -
+        Number(b.fileName.replace(pattern, '')),
     );
 
   return images;
