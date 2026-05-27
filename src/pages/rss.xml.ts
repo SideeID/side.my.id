@@ -1,8 +1,8 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
-import { getCollection } from 'astro:content';
 
 export async function GET(context: APIContext) {
+  const { getCollection } = await import('astro:content');
   const notes = await getCollection('notes');
 
   return rss({
