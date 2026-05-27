@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import { ArrowLeftIcon } from "lucide-svelte";
+import ReadingIndicator from "@/components/svelte/ReadingIndicator.svelte";
 import { Image } from "astro:assets";
 
 export async function getStaticPaths() {
@@ -17,7 +18,7 @@ const { item } = Astro.props;
 const { Content, remarkPluginFrontmatter } = await item.render();
 ---
 
-{/* <ReadingIndicator client:only="svelte" /> */}
+<ReadingIndicator client:only="svelte" />
 <Layout
   title={item.data.title}
   description={item.data.description}
