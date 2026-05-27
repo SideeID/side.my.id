@@ -14,6 +14,8 @@ Yo halo para pembaca semua. Kalo kalian baca ini, disclaimer dulu sebelum jauh m
 
 Bayangkan dalam tiga tahun terakhir saja sudah ada lebih dari 1000 paper yang membahas RAG. Tren ini meledak karena RAG adalah solusi paling masuk akal buat mengatasi keterbatasan Large Language Model (LLM). Singkatnya, RAG atau Retrieval-Augmented Generation adalah cara kita kasih "buku panduan" berupa data eksternal ke AI sebelum dia menjawab pertanyaan kita. Jadi AI tidak cuma mengandalkan hafalan dari masa training (parametric memory), tapi dia juga punya akses ke memori luar (non-parametric memory) sebagai referensi.
 
+![RAG Architecture Overview](https://ik.imagekit.io/hrxp7yzjg/projects/RAG%20image.webp)
+
 ## Kenapa Harus RAG? (Vanilla Recap)
 
 LLM biasanya cuma pintar di data publik hasil training mereka. Masalah muncul saat kamu tanya soal data internal perusahaan atau kode privat yang tidak pernah dilihat si model saat fase pre-training. Dulu solusinya adalah fine-tuning atau melatih ulang model dengan data kamu. Tapi cara ini memerlukan infrastruktur mahal, skill khusus, dan ada risiko AI malah lupa kemampuan aslinya yang disebut catastrophic forgetting. Belum lagi masalah halusinasi di mana AI menjawab dengan sangat yakin padahal salah total.
