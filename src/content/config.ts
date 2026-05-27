@@ -1,7 +1,7 @@
-import { defineCollection, z } from "astro:content";
+import { defineCollection, z } from 'astro:content';
 
 const notesCollection = defineCollection({
-  type: "content",
+  type: 'content',
   schema: z.object({
     author: z.string().min(1),
     title: z.string().min(1),
@@ -12,11 +12,11 @@ const notesCollection = defineCollection({
 });
 
 const worksCollection = defineCollection({
-  type: "content",
+  type: 'content',
   schema: z.object({
-    id: z.number(),
+    date: z.string(),
     author: z.string().min(1),
-    thumbnail: z.string().min(1).includes("https"),
+    thumbnail: z.string().min(1).includes('https'),
     title: z.string().min(1),
     stack: z.array(z.string()),
     repo: z.string().optional(),
