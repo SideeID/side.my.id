@@ -4,6 +4,12 @@ import { getCollection } from "astro:content";
 import { ArrowLeftIcon } from "lucide-svelte";
 import ReadingIndicator from "@/components/svelte/ReadingIndicator.svelte";
 import { Image } from "astro:assets";
+import {
+  generateArticleSchema,
+  generateBreadcrumbSchema,
+  generateGraphSchema,
+  formatSchemaDate,
+} from "@/utils/schema-generators";
 
 export async function getStaticPaths() {
   const worksEntries = await getCollection("works");
@@ -16,13 +22,47 @@ export async function getStaticPaths() {
 
 const { item } = Astro.props;
 const { Content, remarkPluginFrontmatter } = await item.render();
+const workUrl = `https://side.my.id/works/${item.slug}`;
+
+// Generate Article schema for work/project
+const articleSchema = generateArticleSchema({
+  headline: item.data.title,
+  description: item.data.description,
+  url: workUrl,
+  datePublished: formatSchemaDate(item.data.date),
+  author: {
+    name: item.data.author,
+    url: "https://side.my.id",
+  },
+  publisherName: "Dimas Fajar Katon Prayogo",
+  publisherLogo: "https://side.my.id/opengraph.png",
+  image: item.data.thumbnail || "https://side.my.id/opengraph.png",
+});
+
+// Generate Breadcrumb schema
+const breadcrumbSchema = generateBreadcrumbSchema({
+  items: [
+    { name: "Home", url: "https://side.my.id" },
+    { name: "Works", url: "https://side.my.id/works" },
+    { name: item.data.title, url: workUrl },
+  ],
+});
+
+// Combine schemas
+const schema = generateGraphSchema([articleSchema, breadcrumbSchema]);
 ---
 
 <ReadingIndicator client:only="svelte" />
 <Layout
   title={item.data.title}
   description={item.data.description}
-  url={`https://side.my.id/works/${item.slug}`}
+  url={workUrl}
+  schema={schema}
+  articleMeta={{
+    type: "article",
+    author: item.data.author,
+    publishedTime: formatSchemaDate(item.data.date),
+  }}
 >
   <div class="w-full text-justify slide-enter-content">
     <a href="/works" class="flex w-fit items-center justify-center">

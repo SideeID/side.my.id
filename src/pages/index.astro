@@ -3,17 +3,55 @@ import Card from "@/components/Card.astro";
 import Layout from "@/layouts/Layout.astro";
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
+import {
+  generatePersonSchema,
+  generateOrganizationSchema,
+  generateGraphSchema,
+} from "@/utils/schema-generators";
 
 const [notesList, worksList] = await Promise.all([
   await getCollection("notes"),
   await getCollection("works"),
 ]);
+
+// Generate EEAT-optimized Person schema
+const personSchema = generatePersonSchema({
+  name: "Dimas Fajar Katon Prayogo",
+  url: "https://side.my.id",
+  jobTitle: "DevOps Engineer & Fullstack Web Developer",
+  description:
+    "Developer based in Indonesia specializing in backend development, DevOps, and web technologies. Experienced with Laravel, Node.js, Go, and infrastructure automation.",
+  image: "https://avatars.githubusercontent.com/u/132200554?v=4",
+  email: "dimas@side.my.id",
+  sameAs: [
+    "https://github.com/SideeID",
+    "https://linkedin.com/in/dimas-fajar-katon-prayogo",
+    "https://twitter.com/sideid_",
+  ],
+});
+
+// Generate Organization schema
+const organizationSchema = generateOrganizationSchema({
+  name: "Dimas Fajar Katon Prayogo",
+  url: "https://side.my.id",
+  description: "Personal portfolio and blog about web development and DevOps",
+  logo: "https://side.my.id/opengraph.png",
+  sameAs: [
+    "https://github.com/SideeID",
+    "https://linkedin.com/in/dimas-fajar-katon-prayogo",
+    "https://twitter.com/sideid_",
+  ],
+});
+
+// Combine schemas
+const schema = generateGraphSchema([personSchema, organizationSchema]);
 ---
 
 <Layout
   title="Dimas Fajar Katon Prayogo"
-  description="Javascript / Typescript Developer"
+  description="Javascript / Typescript Developer based in Indonesia. Specializing in backend development, DevOps, and full-stack web technologies."
   url="https://side.my.id"
+  schema={schema}
 >
   <div
     class:list={[

@@ -1,0 +1,15 @@
+---
+/**
+ * JsonLd Component
+ * Safely renders JSON-LD structured data for SEO
+ * Usage: <JsonLd schema={schemaObject} />
+ */
+
+interface Props {
+  schema: Record<string, any>;
+}
+
+const { schema } = Astro.props;
+---
+
+<script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
