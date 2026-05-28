@@ -7,6 +7,7 @@ import "@fontsource/geist-mono";
 import "@fontsource/ibm-plex-serif";
 import "@fontsource/noto-naskh-arabic";
 import { ClientRouter } from "astro:transitions";
+import { PUBLIC_GA_ID } from "@/utils/constants";
 // import AskButton from "@/components/AskButton.astro";
 import "../index.css";
 import "katex/dist/katex.min.css";
@@ -84,5 +85,25 @@ const ogType = articleMeta?.type === "article" ? "article" : "website";
     <Navbar currentPath={currentPath} />
     <!-- <AskButton /> -->
     <Analytics />
+    {PUBLIC_GA_ID && (
+      <script define:vars={{ publicGaId: PUBLIC_GA_ID }}>
+        import Analytics from 'analytics';
+        import googleAnalytics from '@analytics/google-analytics';
+
+        const analytics = Analytics({
+          app: 'sideid',
+          plugins: [
+            googleAnalytics({
+              measurementIds: [publicGaId],
+            }),
+          ],
+        });
+
+        analytics.page();
+        window.addEventListener('astro:page-load', () => {
+          analytics.page();
+        });
+      </script>
+    )}
   </body>
 </html>

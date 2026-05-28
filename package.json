@@ -20,6 +20,7 @@
     "lhci:desktop": "lhci autorun --collect.settings.preset=desktop"
   },
   "dependencies": {
+    "@analytics/google-analytics": "^1.1.0",
     "@astrojs/check": "^0.9.9",
     "@astrojs/mdx": "^4.3.14",
     "@astrojs/rss": "^4.0.18",
@@ -36,6 +37,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.3.0",
     "@vercel/analytics": "^2.0.1",
+    "analytics": "^0.8.19",
     "astro": "^5.18.2",
     "astro-compressor": "^1.3.0",
     "date-fns": "4.3.0",

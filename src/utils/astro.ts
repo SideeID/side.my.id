@@ -64,6 +64,10 @@ export const env = {
       context: 'client',
       access: 'public',
     }),
+    PUBLIC_GA_ID: envField.string({
+      context: 'client',
+      access: 'public',
+    }),
     TURSO_DATABASE_URL: envField.string({
       context: 'server',
       access: 'secret',

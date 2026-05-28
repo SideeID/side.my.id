@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -6,6 +6,7 @@ export const PUBLIC_DEVELOPMENT_URL = process.env
   .PUBLIC_DEVELOPMENT_URL as string;
 export const PUBLIC_PRODUCTION_URL = process.env
   .PUBLIC_PRODUCTION_URL as string;
+export const PUBLIC_GA_ID = process.env.PUBLIC_GA_ID as string;
 export const TURSO_DATABASE_URL = process.env.TURSO_DATABASE_URL as string;
 export const TURSO_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN as string;
 export const MODE = process.env.MODE;
