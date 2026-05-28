@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import { format } from "date-fns";
+import { ROUTES } from "@/utils/constants";
 
 type Props = {
   thumbnail?: string;
@@ -26,7 +27,7 @@ const { thumbnail, title, description, slug, createdAt, type } = Astro.props;
         <span class="font-semibold">{format(createdAt, "LLLL d, yyyy")}</span>
       ) : null}
       <a
-        href={`/notes/${slug}`}
+        href={ROUTES.note(slug)}
         class:list={["mt-2 cursor-pointer text-lg font-bold", "no-underline!"]}
       >
         <h3 class="mb-0 mt-0 line-clamp-2 text-2xl font-bold">{title}</h3>
@@ -51,7 +52,7 @@ const { thumbnail, title, description, slug, createdAt, type } = Astro.props;
       />
       <div class="w-full p-4">
         <a
-          href={`/works/${slug}`}
+          href={ROUTES.work(slug)}
           class:list={["cursor-pointer text-lg font-bold", "no-underline!"]}
         >
           <h3 class="mb-0 mt-0 line-clamp-2 text-2xl font-bold">{title}</h3>

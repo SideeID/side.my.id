@@ -7,6 +7,7 @@ import {
   FileBadgeIcon,
 } from "lucide-svelte";
 import { twMerge } from "tailwind-merge";
+import { ROUTES } from "@/utils/constants";
 
 type Props = {
   currentPath: string;
@@ -18,22 +19,26 @@ const navList = [
   {
     id: 1,
     icon: FileCodeIcon,
-    path: "/works",
+    path: ROUTES.works,
+    label: "Works",
   },
   {
     id: 2,
     icon: NotepadTextIcon,
-    path: "/notes",
+    path: ROUTES.notes,
+    label: "Notes",
   },
   {
     id: 3,
     icon: FileBadgeIcon,
-    path: "/certificates",
+    path: ROUTES.certificates,
+    label: "Certificates",
   },
   {
     id: 4,
     icon: HashIcon,
-    path: "/tags",
+    path: ROUTES.tags,
+    label: "Tags",
   },
 ];
 ---
@@ -74,11 +79,11 @@ const navList = [
         <a
           data-cy={`${item.path.slice(1)}-btn`}
           href={item.path}
-          aria-label={item.path}
+          aria-label={item.label}
         >
           <button
             type="button"
-            aria-label={item.path}
+            aria-label={item.label}
             class={twMerge(
               "p-1.5",
               currentPath.includes(item.path)
