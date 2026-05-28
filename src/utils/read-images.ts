@@ -1,9 +1,3 @@
-/**
- * A function to read all image files from user's specified directory
- * @export
- * @param {RegExp} pattern
- * @returns {*}
- */
 export function readImages(_filesDir: string, pattern: RegExp) {
   const imageFiles = import.meta.glob(
     '/public/images/photos/**/*.(png|jpg|jpeg|gif|webp)',

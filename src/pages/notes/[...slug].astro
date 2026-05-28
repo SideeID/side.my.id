@@ -29,7 +29,6 @@ const { item } = Astro.props;
 const { Content, remarkPluginFrontmatter } = await item.render();
 const articleUrl = `https://side.my.id/notes/${item.slug}`;
 
-// Generate Article schema
 const articleSchema = generateArticleSchema({
   headline: item.data.title,
   description: item.data.description,
@@ -44,7 +43,6 @@ const articleSchema = generateArticleSchema({
   image: "https://side.my.id/opengraph.png",
 });
 
-// Generate Breadcrumb schema
 const breadcrumbSchema = generateBreadcrumbSchema({
   items: [
     { name: "Home", url: "https://side.my.id" },
@@ -53,7 +51,6 @@ const breadcrumbSchema = generateBreadcrumbSchema({
   ],
 });
 
-// Combine schemas
 const schema = generateGraphSchema([articleSchema, breadcrumbSchema]);
 ---
 

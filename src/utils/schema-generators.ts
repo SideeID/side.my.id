@@ -1,8 +1,3 @@
-/**
- * JSON-LD Schema Generator Utilities
- * Generates structured data for SEO and AEO optimization
- */
-
 export interface SchemaContext {
   '@context': 'https://schema.org';
 }
@@ -72,9 +67,6 @@ export interface BreadcrumbSchema extends SchemaContext {
   }>;
 }
 
-/**
- * Generate Person schema with credentials and social links
- */
 export function generatePersonSchema(options: {
   name: string;
   url: string;
@@ -98,9 +90,6 @@ export function generatePersonSchema(options: {
   };
 }
 
-/**
- * Generate Organization schema
- */
 export function generateOrganizationSchema(options: {
   name: string;
   url: string;
@@ -120,9 +109,6 @@ export function generateOrganizationSchema(options: {
   };
 }
 
-/**
- * Generate Article schema for blog posts and notes
- */
 export function generateArticleSchema(options: {
   headline: string;
   description: string;
@@ -169,9 +155,6 @@ export function generateArticleSchema(options: {
   };
 }
 
-/**
- * Generate Breadcrumb schema
- */
 export function generateBreadcrumbSchema(options: {
   items: Array<{
     name: string;
@@ -190,9 +173,6 @@ export function generateBreadcrumbSchema(options: {
   };
 }
 
-/**
- * Combine multiple schemas using @graph
- */
 export function generateGraphSchema(schemas: Array<Record<string, any>>): Record<string, any> | null {
   if (schemas.length === 0) return null;
   if (schemas.length === 1) return schemas[0];
@@ -207,9 +187,6 @@ export function generateGraphSchema(schemas: Array<Record<string, any>>): Record
   };
 }
 
-/**
- * Format date to ISO string for schema.org
- */
 export function formatSchemaDate(date: Date | string): string {
   if (typeof date === 'string') {
     return new Date(date).toISOString();
