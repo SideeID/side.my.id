@@ -3,6 +3,7 @@ author: SideID
 title: How to Make WhatsApp bot with Baileys
 tags:
   - bot
+  - tutorial
 created_at: 2025-03-21
 description: How to make a WhatsApp bot with Baileys, a library fot whatsapp webhook.
 ---
@@ -186,7 +187,7 @@ async function startWhatsApp() {
     // If we got a QR code, show it so you can scan it
     if (qr) {
       qrcode.generate(qr, { small: true });
-      console.log('👆 Scan this QR code with your WhatsApp app!');
+      console.log('Scan this QR code with your WhatsApp app!');
     }
   });
 
