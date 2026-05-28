@@ -8,6 +8,7 @@ import {
   generateOrganizationSchema,
   generateGraphSchema,
 } from "@/utils/schema-generators";
+import { ROUTES } from "@/utils/constants";
 
 const [notesList, worksList] = await Promise.all([
   await getCollection("notes"),
@@ -50,7 +51,6 @@ const schema = generateGraphSchema([personSchema, organizationSchema]);
 <Layout
   title="Dimas Fajar Katon Prayogo"
   description="Javascript / Typescript Developer based in Indonesia. Specializing in backend development, DevOps, and full-stack web technologies."
-  url="https://side.my.id"
   schema={schema}
 >
   <div
@@ -195,6 +195,14 @@ const schema = generateGraphSchema([personSchema, organizationSchema]);
             ))
         }
       </div>
+      <div class="flex justify-end mt-3">
+        <a
+          href={ROUTES.works}
+          class="text-sm font-semibold opacity-60 hover:opacity-100 transition-opacity no-underline! flex items-center gap-1"
+        >
+          See all works <span aria-hidden="true">→</span>
+        </a>
+      </div>
     </section>
     <section data-cy="featured-notes" class="mt-8 w-full">
       <h2 class="mt-0 mb-6 font-extrabold">Featured Notes</h2>
@@ -217,6 +225,14 @@ const schema = generateGraphSchema([personSchema, organizationSchema]);
               />
             ))
         }
+      </div>
+      <div class="flex justify-end mt-3">
+        <a
+          href={ROUTES.notes}
+          class="text-sm font-semibold opacity-60 hover:opacity-100 transition-opacity no-underline! flex items-center gap-1"
+        >
+          See all notes <span aria-hidden="true">→</span>
+        </a>
       </div>
     </section>
   </div>

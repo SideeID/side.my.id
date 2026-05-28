@@ -1,26 +1,20 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
+import { ROUTES } from "@/utils/constants";
 
 const notes = await getCollection("notes");
-const tags = ([
-  ...new Set(
-    notes
-      .map((item: CollectionEntry<"notes">) => [...new Set(item.data.tags)].join(" "))
-      .join(" ")
-      .split(" ")
-  ),
-] as string[]).sort((a, b) => {
-  if (a > b) return 1;
-  if (a < b) return -1;
-  return 0;
-});
+
+const tags = [
+  ...new Set(notes.flatMap((item: CollectionEntry<"notes">) =>
+    item.data.tags.map((t: string) => t.toLowerCase())
+  )),
+].sort((a, b) => a.localeCompare(b));
 ---
 
 <Layout
   title="Tags"
-  description="Select spesific notes based on the list of tags below."
-  url="https://side.my.id/tags"
+  description="Select specific notes based on the list of tags below."
 >
   <div
     class:list={[
@@ -32,19 +26,19 @@ const tags = ([
       <h1 data-cy="heading" class="mb-0">~/tags</h1>
       <div class="slide-enter-content">
         <p data-cy="description" class="mb-0 text-justify">
-          Select spesific notes based on the list of tags below.
+          Select specific notes based on the list of tags below.
         </p>
       </div>
     </section>
     <section
       data-cy="tags-list"
-      class="mt-8 flex w-full flex-wrap items-center justify-start gap-4 slide-enter-content"
+      class="mt-8 flex w-full flex-wrap items-center justify-start gap-3 slide-enter-content"
     >
       {
         tags.map((item) => (
-          <a href={`/tags/${item}`}>
-            <button class="bg-monochrome-2 px-4 py-1">
-              <p class="mb-0 mt-0 text-base-0">{item}</p>
+          <a href={ROUTES.tag(item)}>
+            <button class="bg-monochrome-2 hover:bg-monochrome-3 transition-colors px-4 py-1 rounded-md">
+              <p class="mb-0 mt-0 text-base-0 text-sm font-semibold">{item}</p>
             </button>
           </a>
         ))
