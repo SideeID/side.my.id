@@ -7,7 +7,7 @@ import "@fontsource/geist-mono";
 import "@fontsource/ibm-plex-serif";
 import "@fontsource/noto-naskh-arabic";
 import { ClientRouter } from "astro:transitions";
-import { PUBLIC_GA_ID } from "@/utils/constants";
+import { PUBLIC_GA_ID, SITE_URL } from "@/utils/constants";
 // import AskButton from "@/components/AskButton.astro";
 import "../index.css";
 import "katex/dist/katex.min.css";
@@ -15,7 +15,7 @@ import "katex/dist/katex.min.css";
 type Props = {
   title: string;
   description: string;
-  url: string;
+  url?: string;
   image?: string;
   schema?: Record<string, any> | null;
   articleMeta?: {
@@ -26,15 +26,16 @@ type Props = {
   };
 };
 
-const { 
-  title, 
-  description, 
-  url, 
-  image = "https://side.my.id/opengraph.png",
+const {
+  title,
+  description,
+  image = `${SITE_URL}/opengraph.png`,
   schema,
-  articleMeta = {}
+  articleMeta = {},
 } = Astro.props;
+
 const currentPath = Astro.url.pathname;
+const canonicalUrl = Astro.props.url ?? `${SITE_URL}${currentPath}`;
 const ogType = articleMeta?.type === "article" ? "article" : "website";
 ---
 
@@ -46,7 +47,7 @@ const ogType = articleMeta?.type === "article" ? "article" : "website";
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta property="og:type" content={ogType} />
-    <meta property="og:url" content={url} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
@@ -60,13 +61,13 @@ const ogType = articleMeta?.type === "article" ? "article" : "website";
       <meta property="og:article:author" content={articleMeta.author} />
     )}
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={url} />
+    <meta property="twitter:url" content={canonicalUrl} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="canonical" href={url} />
+    <link rel="canonical" href={canonicalUrl} />
     <link rel="sitemap" href="/sitemap.xml" />
     {schema && <JsonLd schema={schema} />}
     <ClientRouter />
@@ -86,7 +87,7 @@ const ogType = articleMeta?.type === "article" ? "article" : "website";
     <!-- <AskButton /> -->
     <Analytics />
     {PUBLIC_GA_ID && (
-      <script define:vars={{ publicGaId: PUBLIC_GA_ID }}>
+      <script is:inline define:vars={{ publicGaId: PUBLIC_GA_ID }}>
         import Analytics from 'analytics';
         import googleAnalytics from '@analytics/google-analytics';
 
