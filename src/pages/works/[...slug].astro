@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
 import { getCollection } from "astro:content";
-import { ArrowLeftIcon } from "lucide-svelte";
 import ReadingIndicator from "@/components/svelte/ReadingIndicator.svelte";
 import { Image } from "astro:assets";
 import {
@@ -10,19 +10,38 @@ import {
   generateGraphSchema,
   formatSchemaDate,
 } from "@/utils/schema-generators";
+import { ROUTES, SITE_URL } from "@/utils/constants";
 
 export async function getStaticPaths() {
   const worksEntries = await getCollection("works");
 
   return worksEntries.map((item) => ({
     params: { slug: item.slug },
-    props: { item },
+    props: {
+      item,
+      allWorks: worksEntries,
+    },
   }));
 }
 
-const { item } = Astro.props;
+const { item, allWorks } = Astro.props;
 const { Content, remarkPluginFrontmatter } = await item.render();
-const workUrl = `https://side.my.id/works/${item.slug}`;
+const workUrl = `${SITE_URL}${ROUTES.work(item.slug)}`;
+
+// Related works: share at least 1 stack item, excluding current
+const relatedWorks = allWorks
+  .filter(
+    (work: typeof item) =>
+      work.slug !== item.slug &&
+      (work.data.stack ?? []).some((s: string) =>
+        (item.data.stack ?? []).includes(s)
+      )
+  )
+  .sort(
+    (a: typeof item, b: typeof item) =>
+      new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+  )
+  .slice(0, 3);
 
 const articleSchema = generateArticleSchema({
   headline: item.data.title,
@@ -31,17 +50,17 @@ const articleSchema = generateArticleSchema({
   datePublished: formatSchemaDate(item.data.date),
   author: {
     name: item.data.author,
-    url: "https://side.my.id",
+    url: SITE_URL,
   },
   publisherName: "Dimas Fajar Katon Prayogo",
-  publisherLogo: "https://side.my.id/opengraph.png",
-  image: item.data.thumbnail || "https://side.my.id/opengraph.png",
+  publisherLogo: `${SITE_URL}/opengraph.png`,
+  image: item.data.thumbnail || `${SITE_URL}/opengraph.png`,
 });
 
 const breadcrumbSchema = generateBreadcrumbSchema({
   items: [
-    { name: "Home", url: "https://side.my.id" },
-    { name: "Works", url: "https://side.my.id/works" },
+    { name: "Home", url: SITE_URL },
+    { name: "Works", url: `${SITE_URL}${ROUTES.works}` },
     { name: item.data.title, url: workUrl },
   ],
 });
@@ -53,7 +72,6 @@ const schema = generateGraphSchema([articleSchema, breadcrumbSchema]);
 <Layout
   title={item.data.title}
   description={item.data.description}
-  url={workUrl}
   schema={schema}
   articleMeta={{
     type: "article",
@@ -62,16 +80,16 @@ const schema = generateGraphSchema([articleSchema, breadcrumbSchema]);
   }}
 >
   <div class="w-full text-justify slide-enter-content">
-    <a href="/works" class="flex w-fit items-center justify-center">
-      <button
-        type="button"
-        aria-label="back to works"
-        class="flex h-8 w-8 items-center justify-center rounded-full bg-monochrome-2"
-      >
-        <ArrowLeftIcon className="text-center" />
-      </button>
-    </a>
-    <h1 class="mt-4">{item.data.title}</h1>
+    <Breadcrumb
+      items={[
+        { label: "Home", href: ROUTES.home },
+        { label: "Works", href: ROUTES.works },
+        { label: item.data.title },
+      ]}
+    />
+
+    <h1 class="mt-0">{item.data.title}</h1>
+
     <div class="flex w-full items-center space-x-2">
       <div class="rounded-full!">
         <Image
@@ -110,9 +128,65 @@ const schema = generateGraphSchema([articleSchema, breadcrumbSchema]);
         }
       </div>
     </div>
+
+    {
+      item.data.stack && item.data.stack.length > 0 && (
+        <div class="not-prose flex flex-wrap gap-2 mt-3 mb-6">
+          {item.data.stack.map((tech: string) => (
+            <a
+              href={ROUTES.tag(tech.toLowerCase())}
+              class="bg-monochrome-2 hover:bg-monochrome-3 transition-colors px-3 py-1 text-xs font-semibold rounded-md no-underline! text-base-0/80 hover:text-base-0"
+            >
+              {tech}
+            </a>
+          ))}
+        </div>
+      )
+    }
+
     <!-- <p class="arabic-font text-right text-xl font-bold">
-      بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+      بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
     </p> -->
     <Content />
+
+    {
+      relatedWorks.length > 0 && (
+        <section class="not-prose mt-12 pt-8 border-t border-monochrome-3">
+          <h2 class="text-lg font-extrabold mb-4 text-base-0">Related Works</h2>
+          <div class="flex flex-col gap-3">
+            {relatedWorks.map((work: typeof item) => (
+              <a
+                href={ROUTES.work(work.slug)}
+                class="group flex items-center gap-3 p-3 rounded-md bg-monochrome-1/70 hover:bg-monochrome-2/70 border-[0.5px] border-monochrome-3 transition-all no-underline!"
+              >
+                <div class="flex flex-col gap-1 min-w-0">
+                  <span class="font-semibold text-base-0 text-sm group-hover:underline line-clamp-2 leading-snug">
+                    {work.data.title}
+                  </span>
+                  <div class="flex flex-wrap gap-1 mt-0.5">
+                    {(work.data.stack ?? [])
+                      .filter((s: string) =>
+                        (item.data.stack ?? []).includes(s)
+                      )
+                      .slice(0, 3)
+                      .map((s: string) => (
+                        <span class="text-xs text-base-0/50">{s}</span>
+                      ))}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div class="mt-4">
+            <a
+              href={ROUTES.works}
+              class="text-sm font-semibold text-base-0/60 hover:text-base-0 transition-colors no-underline!"
+            >
+              View all works
+            </a>
+          </div>
+        </section>
+      )
+    }
   </div>
 </Layout>

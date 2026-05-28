@@ -1,41 +1,53 @@
 ---
 import Card from "@/components/Card.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
 import ReadingIndicator from "@/components/svelte/ReadingIndicator.svelte";
 import Layout from "@/layouts/Layout.astro";
 import { getCollection } from "astro:content";
-
-const notes = await getCollection("notes");
+import { ROUTES } from "@/utils/constants";
 
 export async function getStaticPaths() {
-  const notesEntries = await getCollection("notes");
+  const [notesEntries, worksEntries] = await Promise.all([
+    getCollection("notes"),
+    getCollection("works"),
+  ]);
 
-  const tags = [
-    ...new Set(
-      notesEntries
-        .map((item) => [...new Set(item.data.tags)].join(" "))
-        .join(" ")
-        .split(" ")
-    ),
-  ].sort((a, b) => {
-    if (a > b) return 1;
-    if (a < b) return -1;
-    return 0;
-  });
+  // Normalisasi semua ke lowercase agar "Docker" == "docker"
+  const allTags = [
+    ...new Set([
+      ...notesEntries.flatMap((item) =>
+        item.data.tags.map((t: string) => t.toLowerCase())
+      ),
+      ...worksEntries.flatMap((item) =>
+        (item.data.stack ?? []).map((s: string) => s.toLowerCase())
+      ),
+    ]),
+  ].sort((a, b) => a.localeCompare(b));
 
-  return tags.map((item) => ({
-    params: { slug: item },
-    props: { item },
+  return allTags.map((tag) => ({
+    params: { slug: tag },
+    props: {
+      tag,
+      notes: notesEntries
+        .filter((item) =>
+          item.data.tags.map((t: string) => t.toLowerCase()).includes(tag)
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.data.created_at).getTime() -
+            new Date(a.data.created_at).getTime()
+        ),
+    },
   }));
 }
 
-const currentPath = Astro.url.pathname.split("/")[2];
+const { tag, notes } = Astro.props;
 ---
 
 <ReadingIndicator client:only="svelte" />
 <Layout
-  title={`Notes with tag ${currentPath}.`}
-  description="Notes with tag"
-  url={`https://side.my.id/tags/${currentPath}`}
+  title={`Notes with tag #${tag}`}
+  description={`Browse all notes tagged with #${tag}.`}
 >
   <div
     class:list={[
@@ -44,26 +56,30 @@ const currentPath = Astro.url.pathname.split("/")[2];
     ]}
   >
     <section class="w-full">
-      <h1 class="mb-0">./tags/{currentPath}</h1>
+      <Breadcrumb
+        items={[
+          { label: "Home", href: ROUTES.home },
+          { label: "Tags", href: ROUTES.tags },
+          { label: `#${tag}` },
+        ]}
+      />
+      <h1 class="mb-0">./tags/{tag}</h1>
       <div class="slide-enter-content">
         <p id="description" class="mb-0 text-justify">
-          Notes with tag {currentPath}.
+          {
+            notes.length > 0
+              ? `${notes.length} note${notes.length !== 1 ? "s" : ""} tagged with `
+              : "No notes tagged with "
+          }
+          <strong>#{tag}</strong>.
         </p>
       </div>
     </section>
-    <section class="mt-8 w-full">
-      <div
-        class="grid w-full grid-cols-1 grid-rows-1 gap-4 sm:grid-cols-2 slide-enter-content"
-      >
-        {
-          notes
-            .filter((item) => item.data.tags.includes(currentPath))
-            .sort(
-              (a, b) =>
-                new Date(b.data.created_at).getTime() -
-                new Date(a.data.created_at).getTime()
-            )
-            .map((item) => (
+    {
+      notes.length > 0 && (
+        <section class="mt-8 w-full">
+          <div class="grid w-full grid-cols-1 grid-rows-1 gap-4 sm:grid-cols-2 slide-enter-content">
+            {notes.map((item: any) => (
               <Card
                 title={item.data.title}
                 description={item.data.description}
@@ -71,9 +87,10 @@ const currentPath = Astro.url.pathname.split("/")[2];
                 slug={item.slug}
                 createdAt={item.data.created_at}
               />
-            ))
-        }
-      </div>
-    </section>
+            ))}
+          </div>
+        </section>
+      )
+    }
   </div>
 </Layout>

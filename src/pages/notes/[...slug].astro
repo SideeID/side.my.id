@@ -1,9 +1,9 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
 import { getCollection } from "astro:content";
 import ReadingIndicator from "@/components/svelte/ReadingIndicator.svelte";
 import { format } from "date-fns";
-import { ArrowLeftIcon } from "lucide-svelte";
 import { Image } from "astro:assets";
 import {
   generateArticleSchema,
@@ -11,6 +11,7 @@ import {
   generateGraphSchema,
   formatSchemaDate,
 } from "@/utils/schema-generators";
+import { ROUTES, SITE_URL } from "@/utils/constants";
 
 export async function getStaticPaths() {
   const notesEntries = await getCollection("notes");
@@ -21,13 +22,27 @@ export async function getStaticPaths() {
     },
     props: {
       item,
+      allNotes: notesEntries,
     },
   }));
 }
 
-const { item } = Astro.props;
+const { item, allNotes } = Astro.props;
 const { Content, remarkPluginFrontmatter } = await item.render();
-const articleUrl = `https://side.my.id/notes/${item.slug}`;
+const articleUrl = `${SITE_URL}${ROUTES.note(item.slug)}`;
+
+const relatedNotes = allNotes
+  .filter(
+    (note: typeof item) =>
+      note.slug !== item.slug &&
+      note.data.tags.some((tag: string) => item.data.tags.includes(tag))
+  )
+  .sort(
+    (a: typeof item, b: typeof item) =>
+      new Date(b.data.created_at).getTime() -
+      new Date(a.data.created_at).getTime()
+  )
+  .slice(0, 3);
 
 const articleSchema = generateArticleSchema({
   headline: item.data.title,
@@ -36,17 +51,17 @@ const articleSchema = generateArticleSchema({
   datePublished: formatSchemaDate(item.data.created_at),
   author: {
     name: item.data.author,
-    url: "https://side.my.id",
+    url: SITE_URL,
   },
   publisherName: "Dimas Fajar Katon Prayogo",
-  publisherLogo: "https://side.my.id/opengraph.png",
-  image: "https://side.my.id/opengraph.png",
+  publisherLogo: `${SITE_URL}/opengraph.png`,
+  image: `${SITE_URL}/opengraph.png`,
 });
 
 const breadcrumbSchema = generateBreadcrumbSchema({
   items: [
-    { name: "Home", url: "https://side.my.id" },
-    { name: "Notes", url: "https://side.my.id/notes" },
+    { name: "Home", url: SITE_URL },
+    { name: "Notes", url: `${SITE_URL}${ROUTES.notes}` },
     { name: item.data.title, url: articleUrl },
   ],
 });
@@ -58,7 +73,6 @@ const schema = generateGraphSchema([articleSchema, breadcrumbSchema]);
 <Layout
   title={item.data.title}
   description={item.data.description}
-  url={articleUrl}
   schema={schema}
   articleMeta={{
     type: "article",
@@ -67,16 +81,16 @@ const schema = generateGraphSchema([articleSchema, breadcrumbSchema]);
   }}
 >
   <div class="w-full slide-enter-content text-justify">
-    <a href="/notes" class="flex w-fit items-center justify-center">
-      <button
-        type="button"
-        aria-label="back to notes"
-        class="flex h-8 w-8 items-center justify-center rounded-full bg-monochrome-2"
-      >
-        <ArrowLeftIcon className="text-center" />
-      </button>
-    </a>
-    <h1 class="mt-4">{item.data.title}</h1>
+    <Breadcrumb
+      items={[
+        { label: "Home", href: ROUTES.home },
+        { label: "Notes", href: ROUTES.notes },
+        { label: item.data.title },
+      ]}
+    />
+
+    <h1 class="mt-0">{item.data.title}</h1>
+
     <div class="flex w-full items-center space-x-2">
       <div class="rounded-full!">
         <Image
@@ -94,9 +108,56 @@ const schema = generateGraphSchema([articleSchema, breadcrumbSchema]);
         }
       </span>
     </div>
+
+    {
+      item.data.tags.length > 0 && (
+        <div class="not-prose flex flex-wrap gap-2 mt-3 mb-6">
+          {item.data.tags.map((tag: string) => (
+            <a
+              href={ROUTES.tag(tag)}
+              class="bg-monochrome-2 hover:bg-monochrome-3 transition-colors px-3 py-1 text-xs font-semibold rounded-md no-underline! text-base-0/80 hover:text-base-0"
+            >
+              #{tag}
+            </a>
+          ))}
+        </div>
+      )
+    }
+
     <!-- <p class="arabic-font text-right text-xl font-semibold">
-      بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+      بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
     </p> -->
     <Content />
+
+    {
+      relatedNotes.length > 0 && (
+        <section class="not-prose mt-12 pt-8 border-t border-monochrome-3">
+          <h2 class="text-lg font-extrabold mb-4 text-base-0">Related Notes</h2>
+          <div class="flex flex-col gap-3">
+            {relatedNotes.map((note: typeof item) => (
+              <a
+                href={ROUTES.note(note.slug)}
+                class="group flex flex-col gap-1 p-3 rounded-md bg-monochrome-1/70 hover:bg-monochrome-2/70 border-[0.5px] border-monochrome-3 transition-all no-underline!"
+              >
+                <span class="font-semibold text-base-0 text-sm group-hover:underline line-clamp-2">
+                  {note.data.title}
+                </span>
+                <span class="text-xs text-base-0/50">
+                  {format(note.data.created_at, "LLLL d, yyyy")}
+                </span>
+              </a>
+            ))}
+          </div>
+          <div class="mt-4">
+            <a
+              href={ROUTES.notes}
+              class="text-sm font-semibold text-base-0/60 hover:text-base-0 transition-colors no-underline!"
+            >
+              View all notes
+            </a>
+          </div>
+        </section>
+      )
+    }
   </div>
 </Layout>
