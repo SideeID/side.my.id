@@ -15,13 +15,12 @@ const [notesList, worksList] = await Promise.all([
   await getCollection("works"),
 ]);
 
-// Generate EEAT-optimized Person schema
 const personSchema = generatePersonSchema({
   name: "Dimas Fajar Katon Prayogo",
   url: "https://side.my.id",
   jobTitle: "DevOps Engineer & Fullstack Web Developer",
   description:
-    "Developer based in Indonesia specializing in backend development, DevOps, and web technologies. Experienced with Laravel, Node.js, Go, and infrastructure automation.",
+    "Developer based in Indonesia focused on server and infrastructure (DevOps), web technologies, and automation. Currently learning security and Go.",
   image: "https://avatars.githubusercontent.com/u/132200554?v=4",
   email: "dimas@side.my.id",
   sameAs: [
@@ -31,7 +30,6 @@ const personSchema = generatePersonSchema({
   ],
 });
 
-// Generate Organization schema
 const organizationSchema = generateOrganizationSchema({
   name: "Dimas Fajar Katon Prayogo",
   url: "https://side.my.id",
@@ -44,13 +42,12 @@ const organizationSchema = generateOrganizationSchema({
   ],
 });
 
-// Combine schemas
 const schema = generateGraphSchema([personSchema, organizationSchema]);
 ---
 
 <Layout
   title="Dimas Fajar Katon Prayogo"
-  description="Javascript / Typescript Developer based in Indonesia. Specializing in backend development, DevOps, and full-stack web technologies."
+  description="Javascript / Typescript Developer based in Indonesia. Focused on server and infrastructure (DevOps), security, Go, and automation."
   schema={schema}
 >
   <div
@@ -64,7 +61,7 @@ const schema = generateGraphSchema([personSchema, organizationSchema]);
         class="slide-enter-content flex w-fit space-x-0 md:space-x-4 relative justify-start items-start"
       >
         <div
-          class="bg-monochrome-3 hidden md:block -rotate-3! p-1.5 rounded-md w-[500px] h-fit"
+          class="bg-monochrome-3 hidden md:block -rotate-3! p-1.5 rounded-md w-125 h-fit"
         >
           <Image
           src="https://avatars.githubusercontent.com/u/132200554?v=4"
@@ -84,7 +81,8 @@ const schema = generateGraphSchema([personSchema, organizationSchema]);
             <p data-cy="description" class="mb-0! mt-2 text-justify text-base-0">
             Konnichiwa! I'm Dimas. You can call me <b>Dimas/Dim/Mas</b>. I'm a Developer based in
             Indonesia, also amateur badminton player in my free time. Day-to-day,
-            I mostly working on Backend stuff and currently learning Next, Go, also DevOps.
+            I mostly work on server and infrastructure (DevOps), and I'm currently learning security,
+            Go, and automation.
             </p>
         </div>
       </div>
