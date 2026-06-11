@@ -40,10 +40,10 @@ export const integrations = [
     changefreq: 'weekly',
     priority: 1,
   }),
-  compressor({
-    gzip: true,
-    brotli: true,
-  }),
+  // compressor({
+  //   gzip: true,
+  //   brotli: true,
+  // }),
   // (await import('@playform/compress')).default(),
   svelte(),
   ...(sentryEnabled
