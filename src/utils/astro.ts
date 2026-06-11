@@ -15,6 +15,8 @@ import svelte from '@astrojs/svelte';
 import sentry from '@sentry/astro';
 import { SENTRY_AUTH_TOKEN, SENTRY_DSN, SENTRY_PROJECT } from './constants';
 
+const sentryEnabled = Boolean(SENTRY_DSN && SENTRY_PROJECT && SENTRY_AUTH_TOKEN);
+
 export const integrations = [
   mdx({
     syntaxHighlight: 'shiki',
@@ -42,16 +44,20 @@ export const integrations = [
     gzip: true,
     brotli: true,
   }),
-  (await import('@playform/compress')).default(),
+  // (await import('@playform/compress')).default(),
   svelte(),
-  sentry({
-    dsn: SENTRY_DSN,
-    sourceMapsUploadOptions: {
-      project: SENTRY_PROJECT,
-      authToken: SENTRY_AUTH_TOKEN,
-      telemetry: false,
-    },
-  }),
+  ...(sentryEnabled
+    ? [
+        sentry({
+          dsn: SENTRY_DSN,
+          sourceMapsUploadOptions: {
+            project: SENTRY_PROJECT,
+            authToken: SENTRY_AUTH_TOKEN,
+            telemetry: false,
+          },
+        }),
+      ]
+    : []),
 ];
 
 export const env = {

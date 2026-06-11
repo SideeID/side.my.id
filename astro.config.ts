@@ -5,7 +5,7 @@ import { env, integrations } from './src/utils/astro';
 
 export default defineConfig({
   output: 'static',
-  site: 'https://side.my.id',
+  site: 'https://sideid.dev',
   vite: {
     plugins: [tailwindcss()],
   },

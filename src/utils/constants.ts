@@ -17,7 +17,7 @@ export const SENTRY_AUTH_TOKEN = process.env.SENTRY_AUTH_TOKEN as string;
 
 export const SITE_URL =
   process.env.NODE_ENV === 'production'
-    ? 'https://side.my.id'
+    ? 'https://sideid.dev'
     : 'http://localhost:4321';
 
 export const ROUTES = {
